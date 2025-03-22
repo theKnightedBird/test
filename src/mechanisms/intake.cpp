@@ -4,7 +4,9 @@ using namespace vex;
 
 Intake::Intake(int intake, int conveyor)
 {
-    //intake_motor = motor_group(motor(intake), motor(conveyor));
+    motor motor_1 = motor(intake);
+    motor motor_2 = motor(conveyor);
+    intake_motor = motor_group(motor_1, motor_2);
     state = HOLD;
 }
 
