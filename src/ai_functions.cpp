@@ -152,17 +152,3 @@ void goToObject(OBJECT type){
     // Move to the detected target's position
     moveToPosition(target.mapLocation.x*100, target.mapLocation.y*100);
 }
-
-// Function to grab a ring when the arm is positioned over it
-void grabRing() {
-    Chain.spinFor(-3, rotationUnits::rev, false);
-    Arm.spinTo(-45, rotationUnits::deg);
-    Arm.spinTo(500, rotationUnits::deg, false);
-    
-}
-// Function to drop the ring when the arm is postioned over a goal
-void dropRing() {
-    Arm.spinTo(500, rotationUnits::deg);
-    Chain.spinFor(3, rotationUnits::rev, 40, velocityUnits::pct);
-    Chain.spinFor(-3, rotationUnits::rev, false);
-}

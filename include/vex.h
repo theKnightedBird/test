@@ -18,7 +18,6 @@
 #include <cmath>
 #include "ai_jetson.h"
 #include "ai_robot_link.h"
-#include "intake.hpp"
 
 #define waitUntil(condition) \
   do                         \

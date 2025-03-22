@@ -4,13 +4,13 @@ using namespace vex;
 
 Arm::Arm(int port)
 {
-    arm_motor(motor(port));
+    //arm_motor = motor_group(vex::motor(3));
     state = IDLE;
 }
 
 Arm::Arm(int port1, int port2)
 {
-    arm_motor(motor(port1), motor(port2));
+    //arm_motor = motor_group(vex::motor(1), vex::motor(2));
     state = IDLE;
 }
 

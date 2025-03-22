@@ -1,6 +1,8 @@
 #pragma once
 #include <vex.h>
 
+using namespace vex;
+
 enum clamp_state
 {
     CLAMP,

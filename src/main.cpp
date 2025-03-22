@@ -16,14 +16,13 @@ using namespace vex;
 brain Brain;
 
 // Robot configuration code.
-motor leftDrive = motor(PORT1, ratio18_1, false);
-motor rightDrive = motor(PORT2, ratio18_1, true);
-gps GPS = gps(PORT12, -127, -165, distanceUnits::mm, 180);
+motor leftDrive = motor(PORT4, ratio18_1, false);
+motor rightDrive = motor(PORT5, ratio18_1, true);
+gps GPS = gps(PORT20, -127, -165, distanceUnits::mm, 180);
 smartdrive Drivetrain = smartdrive(leftDrive, rightDrive, GPS, 319.19, 320, 40, mm, 1);
 // Controls arm used for raising and lowering rings
 // Controls the chain at the front of the arm
 // used for pushing rings off of the arm
-motor Chain = motor(PORT8, ratio18_1, false);
 
 
 // A global instance of competition
@@ -34,6 +33,7 @@ competition Competition;
 //
 ai::jetson  jetson_comms;
 
+
 /*----------------------------------------------------------------------------*/
 // Create a robot_link on PORT1 using the unique name robot_32456_1
 // The unique name should probably incorporate the team number
@@ -42,14 +42,14 @@ ai::jetson  jetson_comms;
 // The Demo is symetrical, we send the same data and display the same status on both
 // manager and worker robots
 // Comment out the following definition to build for the worker robot
-#define  MANAGER_ROBOT    1
+//#define  MANAGER_ROBOT    1
 
 #if defined(MANAGER_ROBOT)
 #pragma message("building for the manager")
-ai::robot_link       link( PORT10, "robot_32456_1", linkType::manager );
+ai::robot_link       link( PORT9, "robot_32456_1", linkType::manager );
 #else
 #pragma message("building for the worker")
-ai::robot_link       link( PORT10, "robot_32456_1", linkType::worker );
+ai::robot_link       link( PORT2, "robot_32456_1", linkType::worker );
 #endif
 
 /*---------------------------------------------------------------------------*/
@@ -68,21 +68,6 @@ void auto_Isolation(void) {
   // Optional wait to allow for calibration
   waitUntil(!(GPS.isCalibrating()));
   // Set brake mode for the arm
-  Arm.setStopping(brakeType::hold);
-  // Reset the position of the arm while its still on the ground
-  Arm.resetPosition();
-  // Lift the arm to prevent dragging
-  Arm.spinTo(75, rotationUnits::deg);
-
-  // Finds and moves robot to over the closest blue ring
-  goToObject(OBJECT::BlueRing);
-  grabRing();
-  // Find and moves robot to the closest mobile drop
-  // then drops the ring on the goal
-  goToObject(OBJECT::MobileGoal);
-  dropRing();
-  // Back off from the goal
-  Drivetrain.driveFor(-30, distanceUnits::cm);
 
 }
 
@@ -122,6 +107,8 @@ void autonomousMain(void) {
   // and we will enter the interaction period. 
   // ..........................................................................
 
+  printf("Robot coordinates: (", GPS.xPosition(), ",", GPS.yPosition(), ")");
+  printf("Coordinates to nearest blue ring: (", findTarget(BlueRing).mapLocation.x, ",", findTarget(BlueRing).mapLocation.y, ")");
   if(firstAutoFlag)
     auto_Isolation();
   else 
@@ -152,8 +139,6 @@ int main() {
   //
   //FILE *fp = fopen("/dev/serial2","wb");
   this_thread::sleep_for(loop_time);
-
-  Arm.setVelocity(60, percent);
 
   while(1) {
       // get last map data

@@ -2,10 +2,10 @@
 
 using namespace vex;
 
-Clamp::Clamp(triport::port port) : piston(port)
-{
-    state = UNCLAMP;
-}
+// Clamp::Clamp(triport::port port) : piston(port)
+// {
+//     state = UNCLAMP;
+// }
 
 void Clamp::clamp()
 {
