@@ -1,20 +1,17 @@
 #include "vbdrive.hpp"
-
 using namespace vex;
 
 VB_Drive::VB_Drive(
     motor_group left,
     motor_group right,
     double gps_port,
-    double wheelTravel = 320,
-    double trackWidth = 320,
-    double wheelBase = 130,
-    distanceUnits unit = distanceUnits::mm,
-    double externalGearRatio = 1.0) : drive(left, right, GPS, wheelTravel, trackWidth, wheelBase, unit, externalGearRatio), GPS(gps_port)
+    double wheelTravel,
+    double trackWidth,
+    double wheelBase,
+    distanceUnits unit,
+    double externalGearRatio) : drive(left, right, GPS, wheelTravel, trackWidth, wheelBase, unit, externalGearRatio),
+                                GPS(gps_port)
 {
-}
-void VB_Drive::calibrate() {
-    GPS.calibrate();
 }
 double VB_Drive::distanceTo(double target_x, double target_y)
 {
@@ -50,6 +47,7 @@ double VB_Drive::calculateBearing(double currX, double currY, double targetX, do
 }
 void VB_Drive::turnTo(double angle, int tolerance, int speed)
 {
+
     double current_heading = GPS.heading();
     double angle_to_turn = angle - current_heading;
 
@@ -154,4 +152,9 @@ void VB_Drive::goToObject(OBJECT type)
     }
     // Move to the detected target's position
     moveToPosition(target.mapLocation.x * 100, target.mapLocation.y * 100);
+}
+void VB_Drive::calibrate()
+{
+    GPS.calibrate();
+    waitUntil(!GPS.isCalibrating());
 }

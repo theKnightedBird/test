@@ -1,3 +1,5 @@
+#pragma once
+#include <robot-config.h>
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Module:       main.cpp                                                  */
@@ -10,26 +12,10 @@
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // ---- END VEXCODE CONFIGURED DEVICES ----
 
-#include <vex.h>
-
 using namespace vex;
 
 brain Brain;
-
-// Robot configuration code.
-motor leftDrive = motor(PORT4, ratio18_1, false);
-motor rightDrive = motor(PORT5, ratio18_1, true);
-
-// Controls arm used for raising and lowering rings
-// Controls the chain at the front of the arm
-// used for pushing rings off of the arm
-
-// A global instance of competition
 competition Competition;
-
-// create instance of jetson class to receive location and other
-// data from the Jetson nano
-//
 ai::jetson jetson_comms;
 
 /*----------------------------------------------------------------------------*/
@@ -40,11 +26,17 @@ ai::jetson jetson_comms;
 // The Demo is symetrical, we send the same data and display the same status on both
 // manager and worker robots
 // Comment out the following definition to build for the worker robot
-// #define  MANAGER_ROBOT    1
+#define MANAGER_ROBOT 1
 
 #if defined(MANAGER_ROBOT)
 #pragma message("building for the manager")
 ai::robot_link link(PORT9, "robot_32456_1", linkType::manager);
+motor left_side = motor(1);
+motor right_side = motor(4);
+VB_Drive drive(left_side, right_side, 7);
+Arm arm(8, 9);
+Clamp clamp(Brain.ThreeWirePort.A);
+Intake intake(10, 11);
 #else
 #pragma message("building for the worker")
 ai::robot_link link(PORT2, "robot_32456_1", linkType::worker);
@@ -62,6 +54,9 @@ ai::robot_link link(PORT2, "robot_32456_1", linkType::worker);
 
 void auto_Isolation(void)
 {
+  drive.calibrate();
+  
+  
 }
 
 /*---------------------------------------------------------------------------*/

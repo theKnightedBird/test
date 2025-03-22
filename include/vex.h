@@ -7,6 +7,7 @@
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 //
+#pragma once
 #include "math.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,6 +19,13 @@
 #include "ai_jetson.h"
 #include "ai_robot_link.h"
 
+using namespace vex;
+
+extern brain Brain;
+extern controller Controller;
+extern ai::jetson jetson_comms;
+extern ai::robot_link link;
+
 #define waitUntil(condition) \
   do                         \
   {                          \
@@ -26,8 +34,5 @@
 
 #define repeat(iterations) \
   for (int iterator = 0; iterator < iterations; iterator++)
-
-extern ai::jetson jetson_comms;
-extern ai::robot_link link;
 
 extern int dashboardTask(void);

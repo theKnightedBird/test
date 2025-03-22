@@ -1,6 +1,5 @@
 #pragma once
-#include <vex.h>
-#include <string>
+#include "vex.h"
 
 using namespace vex;
 
@@ -20,6 +19,7 @@ public:
     void grab();
     void score();
     void periodic();
+
 private:
     motor_group arm_motor;
     arm_state state;

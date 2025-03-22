@@ -1,3 +1,5 @@
+#pragma once
+#include "vex.h"
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Copyright (c) Innovation First 2020 All rights reserved.                */
@@ -8,8 +10,6 @@
 /*    Created:    20 August 2020                                              */
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
-#include "vex.h"
-#include "robot-config.h"
 
 using namespace vex;
 

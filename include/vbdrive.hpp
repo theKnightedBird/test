@@ -1,5 +1,5 @@
 #pragma once
-#include <vex.h>
+#include "vex.h"
 
 using namespace vex;
 
@@ -18,11 +18,11 @@ public:
         motor_group left,
         motor_group right,
         double gps_port,
-        double wheelTravel,
-        double trackWidth,
-        double wheelBase,
-        distanceUnits unit,
-        double externalGearRatio);
+        double wheelTravel = 320,
+        double trackWidth = 320,
+        double wheelBase = 130,
+        distanceUnits unit = distanceUnits::mm,
+        double externalGearRatio = 1.0);
     void calibrate();
     double distanceTo(double target_x, double target_y);
     double calculateBearing(double currX, double currY, double targetX, double targetY);
