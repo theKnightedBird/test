@@ -14,13 +14,13 @@
 using namespace vex;
 
 brain Brain;
+
 // Robot configuration code.
 motor leftDrive = motor(PORT1, ratio18_1, false);
 motor rightDrive = motor(PORT2, ratio18_1, true);
 gps GPS = gps(PORT12, -127, -165, distanceUnits::mm, 180);
 smartdrive Drivetrain = smartdrive(leftDrive, rightDrive, GPS, 319.19, 320, 40, mm, 1);
 // Controls arm used for raising and lowering rings
-motor Arm = motor(PORT3, ratio18_1, false);
 // Controls the chain at the front of the arm
 // used for pushing rings off of the arm
 motor Chain = motor(PORT8, ratio18_1, false);
@@ -67,7 +67,6 @@ void auto_Isolation(void) {
   GPS.calibrate();
   // Optional wait to allow for calibration
   waitUntil(!(GPS.isCalibrating()));
-
   // Set brake mode for the arm
   Arm.setStopping(brakeType::hold);
   // Reset the position of the arm while its still on the ground

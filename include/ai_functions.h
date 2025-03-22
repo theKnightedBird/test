@@ -13,7 +13,8 @@
 #include <vex.h>
 #include <robot-config.h>
 
-enum OBJECT {
+enum OBJECT
+{
     MobileGoal,
     RedRing,
     BlueRing,
