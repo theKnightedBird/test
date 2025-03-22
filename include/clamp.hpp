@@ -21,4 +21,5 @@ public:
 private:
     vex::digital_out piston;
     clamp_state state;
+    thread t;
 };

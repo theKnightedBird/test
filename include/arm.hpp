@@ -23,4 +23,5 @@ public:
 private:
     motor_group arm_motor;
     arm_state state;
+    thread t;
 };

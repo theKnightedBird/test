@@ -55,8 +55,8 @@ ai::robot_link link(PORT2, "robot_32456_1", linkType::worker);
 void auto_Isolation(void)
 {
   drive.calibrate();
-  
-  
+  intake.intake();
+  drive.goToObject(BlueRing);
 }
 
 /*---------------------------------------------------------------------------*/

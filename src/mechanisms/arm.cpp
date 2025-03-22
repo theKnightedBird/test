@@ -7,6 +7,7 @@ Arm::Arm(int port)
     motor motor_1 = motor(port);
     arm_motor = motor_group(motor_1);
     state = IDLE;
+    thread(periodic);
 }
 
 Arm::Arm(int port_1, int port_2)
@@ -34,17 +35,20 @@ void Arm::score()
 
 void Arm::periodic()
 {
-    switch (state)
+    while (1)
     {
-    case IDLE:
-        arm_motor.stop();
-    case GRABBING:
-        arm_motor.spinToPosition(150.0, degrees, false);
-        break;
-    case SCORING:
-        arm_motor.spinToPosition(210.0, degrees, false);
-        break;
-    default:
-        break;
+        switch (state)
+        {
+        case IDLE:
+            arm_motor.stop();
+        case GRABBING:
+            arm_motor.spinToPosition(150.0, degrees, false);
+            break;
+        case SCORING:
+            arm_motor.spinToPosition(210.0, degrees, false);
+            break;
+        default:
+            break;
+        }
     }
 }

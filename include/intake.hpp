@@ -21,4 +21,5 @@ public:
 private:
     vex::motor_group intake_motor;
     intake_state state;
+    thread t;
 };
