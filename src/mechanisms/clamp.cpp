@@ -20,18 +20,16 @@ void Clamp::unclamp()
 
 void Clamp::periodic()
 {
-    while (1)
+
+    switch (state)
     {
-        switch (state)
-        {
-        case CLAMP:
-            piston.set(true);
-            break;
-        case UNCLAMP:
-            piston.set(false);
-            break;
-        default:
-            break;
-        }
+    case CLAMP:
+        piston.set(true);
+        break;
+    case UNCLAMP:
+        piston.set(false);
+        break;
+    default:
+        break;
     }
 }

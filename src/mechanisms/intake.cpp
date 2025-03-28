@@ -8,7 +8,6 @@ Intake::Intake(int intake, int conveyor)
     motor motor_2 = motor(conveyor);
     intake_motor = motor_group(motor_1, motor_2);
     state = HOLD;
-    thread(periodic);
 }
 
 void Intake::intake()
@@ -28,22 +27,20 @@ void Intake::hold()
 
 void Intake::periodic()
 {
-    while (1)
+
+    switch (state)
     {
-        switch (state)
-        {
-        case INTAKE:
-            intake_motor.spin(vex::fwd);
-            break;
-        case OUTTAKE:
-            intake_motor.spin(vex::reverse);
-            break;
-        case HOLD:
-            intake_motor.stop();
-            break;
-        default:
-            intake_motor.stop();
-            break;
-        }
+    case INTAKE:
+        intake_motor.spin(vex::fwd);
+        break;
+    case OUTTAKE:
+        intake_motor.spin(vex::reverse);
+        break;
+    case HOLD:
+        intake_motor.stop();
+        break;
+    default:
+        intake_motor.stop();
+        break;
     }
 }

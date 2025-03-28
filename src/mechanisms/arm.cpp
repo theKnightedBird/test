@@ -35,20 +35,18 @@ void Arm::score()
 
 void Arm::periodic()
 {
-    while (1)
+
+    switch (state)
     {
-        switch (state)
-        {
-        case IDLE:
-            arm_motor.stop();
-        case GRABBING:
-            arm_motor.spinToPosition(150.0, degrees, false);
-            break;
-        case SCORING:
-            arm_motor.spinToPosition(210.0, degrees, false);
-            break;
-        default:
-            break;
-        }
+    case IDLE:
+        arm_motor.stop();
+    case GRABBING:
+        arm_motor.spinToPosition(150.0, degrees, false);
+        break;
+    case SCORING:
+        arm_motor.spinToPosition(210.0, degrees, false);
+        break;
+    default:
+        break;
     }
 }

@@ -37,26 +37,44 @@ VB_Drive drive(left_side, right_side, 7);
 Arm arm(8, 9);
 Clamp clamp(Brain.ThreeWirePort.A);
 Intake intake(10, 11);
+void periodic()
+{
+  while (1)
+  {
+    arm.periodic();
+    clamp.periodic();
+    intake.periodic();
+  }
+}
+thread periodicThread = thread(periodic);
+
 #else
 #pragma message("building for the worker")
 ai::robot_link link(PORT2, "robot_32456_1", linkType::worker);
+motor fl(2);
+motor fr(10);
+motor bl(11);
+motor br(16);
+motor_group left_side(fl, bl);
+motor_group right_side(fr, br);
+VB_Drive drive(left_side, right_side, 20, 4 * M_PI, 11.0, 10.5, inches, 1.0)
 #endif
 
-/*---------------------------------------------------------------------------*/
-/*                                                                           */
-/*                          Auto_Isolation Task                              */
-/*                                                                           */
-/*  This task is used to control your robot during the autonomous isolation  */
-/*  phase of a VEX AI Competition.                                           */
-/*                                                                           */
-/*  You must modify the code to add your own robot specific commands here.   */
-/*---------------------------------------------------------------------------*/
+    /*---------------------------------------------------------------------------*/
+    /*                                                                           */
+    /*                          Auto_Isolation Task                              */
+    /*                                                                           */
+    /*  This task is used to control your robot during the autonomous isolation  */
+    /*  phase of a VEX AI Competition.                                           */
+    /*                                                                           */
+    /*  You must modify the code to add your own robot specific commands here.   */
+    /*---------------------------------------------------------------------------*/
 
-void auto_Isolation(void)
+    void
+    auto_Isolation(void)
 {
   drive.calibrate();
-  intake.intake();
-  drive.goToObject(BlueRing);
+  drive.moveToPosition(4.0, 4.0, 135);
 }
 
 /*---------------------------------------------------------------------------*/
