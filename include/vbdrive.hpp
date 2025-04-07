@@ -31,8 +31,8 @@ public:
     void moveToPosition(double target_x, double target_y, double target_theta = -1);
     DETECTION_OBJECT findTarget(int type);
     void goToObject(OBJECT type);
+    gps GPS;
+    smartdrive drive;
 
 private:
-    smartdrive drive;
-    gps GPS;
 };

@@ -9,9 +9,10 @@ VB_Drive::VB_Drive(
     double trackWidth,
     double wheelBase,
     distanceUnits unit,
-    double externalGearRatio) : drive(left, right, GPS, wheelTravel, trackWidth, wheelBase, unit, externalGearRatio),
-                                GPS(gps_port)
+    double externalGearRatio) : GPS(gps_port), drive(left, right, GPS, wheelTravel, trackWidth, wheelBase, unit, externalGearRatio)
+
 {
+    drive.setStopping(brake);
 }
 double VB_Drive::distanceTo(double target_x, double target_y)
 {
@@ -59,14 +60,12 @@ void VB_Drive::turnTo(double angle, int tolerance, int speed)
 
     // Determine the direction to turn (left or right)
     turnType direction = angle_to_turn > 0 ? turnType::left : turnType::right;
-    drive.turn(direction, speed, velocityUnits::pct);
+    drive.turn(turnType::left, speed, velocityUnits::pct);
     while (1)
     {
-
-        current_heading = GPS.heading();
-        // Check if the current heading is within a tolerance of degrees to the target
-        if (current_heading > (angle - tolerance) && current_heading < (angle + tolerance))
+        if (GPS.heading(degrees) > 50 && GPS.heading(degrees) < 70)
         {
+            drive.stop();
             break;
         }
     }

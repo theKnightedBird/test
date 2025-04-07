@@ -1,5 +1,6 @@
 #pragma once
 #include "vex.h"
+
 /*----------------------------------------------------------------------------*/
 /*                                                                            */
 /*    Copyright (c) Innovation First 2020 All rights reserved.                */
@@ -51,6 +52,7 @@ dashboardJetson(int ox, int oy, int width, int height)
   Brain.Screen.printAt(ox + 10, oy += 15, "data/sec  %d             ", total_data);
   Brain.Screen.printAt(ox + 10, oy += 15, "pkts/sec  %d             ", total_packets);
   Brain.Screen.printAt(ox + 10, oy += 15, "count     %d", local_map.detectionCount);
+  Brain.Screen.printAt(ox + 10, oy += 15, "heading   %d", GPS.heading());
   oy += 15; // Skip a line
 
   // once per second, update data rate stats

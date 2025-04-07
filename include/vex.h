@@ -25,6 +25,8 @@ extern brain Brain;
 extern controller Controller;
 extern ai::jetson jetson_comms;
 extern ai::robot_link link;
+extern gps GPS;
+extern int marker;
 
 #define waitUntil(condition) \
   do                         \

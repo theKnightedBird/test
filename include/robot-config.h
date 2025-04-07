@@ -8,10 +8,7 @@
 
 using namespace vex;
 
-extern VB_Drive drive;
-extern Arm arm;
-extern Clamp clamp;
-extern Intake intake;
+extern smartdrive drive;
 
 /**
  * Used to initialize code/tasks/devices added using tools in VEXcode Pro.
