@@ -12,16 +12,19 @@ Intake::Intake(int intake, int conveyor)
 
 void Intake::intake()
 {
+    intake_motor.spin(vex::fwd);
     state = INTAKE;
 }
 
 void Intake::outtake()
 {
+    intake_motor.spin(vex::reverse);
     state = OUTTAKE;
 }
 
 void Intake::hold()
 {
+    intake_motor.stop();
     state = HOLD;
 }
 

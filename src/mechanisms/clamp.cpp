@@ -10,11 +10,13 @@ Clamp::Clamp(triport::port port) : piston(port)
 
 void Clamp::clamp()
 {
+    piston.set(true);
     state = CLAMP;
 }
 
 void Clamp::unclamp()
 {
+    piston.set(false);
     state = UNCLAMP;
 }
 
