@@ -2,12 +2,16 @@ using namespace vex;
 
 extern brain Brain;
 
+extern bool isRed;
+
 extern motor leftDrive;
 extern motor rightDrive;
 extern gps GPS;
 extern smartdrive Drivetrain;
+extern digital_out clamp;
+extern digital_out doinker;
 extern motor Arm;
-extern motor Chain;
+extern motor intake;
 extern controller Controller;
 
 /**

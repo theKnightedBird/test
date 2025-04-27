@@ -31,6 +31,14 @@ void moveToPosition(double target_x, double target_y, double target_theta);
 // Finds a target object based on the specified type
 DETECTION_OBJECT findTarget(int type);
 
+void grab_goal(void);
+
+void score_ring(void);
+
+void clear_corner(void);
+
+void drop_in_corner(void);
+
 // Drives to the closest specified object
 void goToObject(OBJECT type);
 
