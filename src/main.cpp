@@ -16,7 +16,6 @@ using namespace vex;
 brain Brain;
 // Robot configuration code.
 
-
 // A global instance of competition
 competition Competition;
 
@@ -41,18 +40,18 @@ bool isRed = false;
 #pragma message("building for the manager")
 ai::robot_link link(PORT10, "robot_32456_1", linkType::manager);
 // things for 24-inch
-motor left1 = motor(18, ratio18_1, false);
-motor left2 = motor(19, ratio18_1, true);
-motor left3 = motor(20, ratio18_1, true);
-motor_group leftDrive = motor_group(left1, left2, left3);
-motor right1 = motor(15, ratio18_1, false);
-motor right2 = motor(16, ratio18_1, true);
-motor right3 = motor(17, ratio18_1, false);
-motor_group rightDrive = motor_group(left1, left2, left3);
+motor left1 = motor(14, ratio6_1, false);
+motor left2 = motor(19, ratio6_1, true);
+motor left3 = motor(20, ratio6_1, true);
+motor_group leftDrive = motor_group(left1, left2);
+motor right1 = motor(15, ratio6_1, false);
+motor right2 = motor(16, ratio6_1, true);
+motor right3 = motor(17, ratio6_1, false);
+motor_group rightDrive = motor_group(right2);
 gps GPS = gps(PORT7, -127, -165, distanceUnits::mm, 180);
 smartdrive Drivetrain = smartdrive(leftDrive, rightDrive, GPS, 319.19, 320, 40, mm, 1);
-digital_out clamp = digital_out(Brain.ThreeWirePort.A);
-digital_out doinker = digital_out(Brain.ThreeWirePort.B);
+digital_out clamp = digital_out(Brain.ThreeWirePort.G);
+digital_out doinker = digital_out(Brain.ThreeWirePort.H);
 motor intake = motor(PORT8, ratio18_1, false);
 #else
 #pragma message("building for the worker")
@@ -92,22 +91,15 @@ void auto_Isolation(void)
   // Optional wait to allow for calibration
   waitUntil(!(GPS.isCalibrating()));
 
-  // Set brake mode for the arm
-  Arm.setStopping(brakeType::hold);
-  // Reset the position of the arm while its still on the ground
-  Arm.resetPosition();
-  // Lift the arm to prevent dragging
-  Arm.spinTo(75, rotationUnits::deg);
-
-  // Finds and moves robot to over the closest blue ring
-  goToObject(OBJECT::BlueRing);
-  grabRing();
-  // Find and moves robot to the closest mobile drop
-  // then drops the ring on the goal
-  goToObject(OBJECT::MobileGoal);
-  dropRing();
-  // Back off from the goal
-  Drivetrain.driveFor(-30, distanceUnits::cm);
+  // // Finds and moves robot to over the closest blue ring
+  // goToObject(OBJECT::BlueRing);
+  // grabRing();
+  // // Find and moves robot to the closest mobile drop
+  // // then drops the ring on the goal
+  // goToObject(OBJECT::MobileGoal);
+  // dropRing();
+  // // Back off from the goal
+  // Drivetrain.driveFor(-30, distanceUnits::cm);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -122,17 +114,18 @@ void auto_Isolation(void)
 
 void auto_Interaction(void)
 {
-  clear_corner();
-  while (true)
-  {
-    grab_goal();
-    repeat(6)
-    {
-      score_ring();
-    }
+  Drivetrain.setDriveVelocity(90, percentUnits::pct);
+  Drivetrain.drive(forward);
+  // while (true)
+  // {
+  //   grab_goal();
+  //   repeat(6)
+  //   {
+  //     score_ring();
+  //   }
 
-    drop_in_corner();
-  }
+  //   drop_in_corner();
+  // }
 }
 
 /*---------------------------------------------------------------------------*/
@@ -144,7 +137,7 @@ void auto_Interaction(void)
 /*                                                                           */
 /*---------------------------------------------------------------------------*/
 
-bool firstAutoFlag = true;
+bool firstAutoFlag = false;
 
 void autonomousMain(void)
 {
@@ -186,8 +179,6 @@ int main()
   //
   // FILE *fp = fopen("/dev/serial2","wb");
   this_thread::sleep_for(loop_time);
-
-  Arm.setVelocity(60, percent);
 
   while (1)
   {

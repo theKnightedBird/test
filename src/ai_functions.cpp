@@ -171,10 +171,6 @@ void goToObject(OBJECT type, bool reverse = false)
         target = findTarget(0);
     }
     // If the object is a ring, raise the arm so it can be picked up
-    if (type == OBJECT::BlueRing || type == OBJECT::RedRing)
-    {
-        Arm.spinTo(300, rotationUnits::deg);
-    }
     // Move to the detected target's position
     if (reverse)
     {
@@ -243,17 +239,4 @@ void drop_in_corner(void)
     Drivetrain.driveFor(10, distanceUnits::cm, true);
 }
 
-// Function to grab a ring when the arm is positioned over it
-void grabRing()
-{
-    intake.spinFor(-3, rotationUnits::rev, false);
-    Arm.spinTo(-45, rotationUnits::deg);
-    Arm.spinTo(500, rotationUnits::deg, false);
-}
-// Function to drop the ring when the arm is postioned over a goal
-void dropRing()
-{
-    Arm.spinTo(500, rotationUnits::deg);
-    intake.spinFor(3, rotationUnits::rev, 40, velocityUnits::pct);
-    intake.spinFor(-3, rotationUnits::rev, false);
-}
+// Function to grab a ring when the arm is positioned over 

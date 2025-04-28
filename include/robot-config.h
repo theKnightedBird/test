@@ -4,13 +4,12 @@ extern brain Brain;
 
 extern bool isRed;
 
-extern motor leftDrive;
-extern motor rightDrive;
+extern motor_group leftDrive;
+extern motor_group rightDrive;
 extern gps GPS;
 extern smartdrive Drivetrain;
 extern digital_out clamp;
 extern digital_out doinker;
-extern motor Arm;
 extern motor intake;
 extern controller Controller;
 
