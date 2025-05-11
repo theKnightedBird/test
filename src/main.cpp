@@ -40,15 +40,16 @@ bool isRed = false;
 #pragma message("building for the manager")
 ai::robot_link link(PORT10, "robot_32456_1", linkType::manager);
 // things for 24-inch
-motor left1 = motor(14, ratio6_1, false);
-motor left2 = motor(19, ratio6_1, true);
-motor left3 = motor(20, ratio6_1, true);
-motor_group leftDrive = motor_group(left1, left2);
-motor right1 = motor(15, ratio6_1, false);
-motor right2 = motor(16, ratio6_1, true);
-motor right3 = motor(17, ratio6_1, false);
-motor_group rightDrive = motor_group(right2);
-gps GPS = gps(PORT7, -127, -165, distanceUnits::mm, 180);
+motor motor14 = motor(14, ratio6_1, false);
+motor motor16 = motor(16, ratio6_1, false);
+motor motor19 = motor(19, ratio6_1, false);
+motor motor17 = motor(17, ratio6_1, false);
+motor motor13 = motor(13, ratio6_1, true);
+motor motor15 = motor(15, ratio6_1, false);
+motor_group leftDrive = motor_group(motor13, motor15);
+
+motor_group rightDrive = motor_group(motor14, motor16);
+gps GPS = gps(2, -127, -165, distanceUnits::mm, 180);
 smartdrive Drivetrain = smartdrive(leftDrive, rightDrive, GPS, 319.19, 320, 40, mm, 1);
 digital_out clamp = digital_out(Brain.ThreeWirePort.G);
 digital_out doinker = digital_out(Brain.ThreeWirePort.H);
@@ -114,8 +115,24 @@ void auto_Isolation(void)
 
 void auto_Interaction(void)
 {
-  Drivetrain.setDriveVelocity(90, percentUnits::pct);
+  Drivetrain.setDriveVelocity(50, percentUnits::pct);
   Drivetrain.drive(forward);
+  //turnTo(10.0, 1.0, 50);
+  // leftDrive.spinFor(5, sec);
+  // rightDrive.spinFor(5, sec);
+
+  // motor13.spinFor(1, sec);
+  // wait(1, sec);
+  // motor14.spinFor(1, sec);
+  // wait(1, sec);
+  // motor15.spinFor(1, sec);
+  // wait(1, sec);
+  // motor16.spinFor(1, sec);
+  // wait(1, sec);
+  // motor17.spinFor(1, sec);
+  // wait(1, sec);
+  // motor19.spinFor(1, sec);
+  // wait(1, sec);
   // while (true)
   // {
   //   grab_goal();
