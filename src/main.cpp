@@ -38,39 +38,46 @@ bool isRed = false;
 
 #if defined(MANAGER_ROBOT)
 #pragma message("building for the manager")
-ai::robot_link link(PORT10, "robot_32456_1", linkType::manager);
+ai::robot_link link(PORT15, "robot_32456_1", linkType::manager);
 // things for 24-inch
-motor motor14 = motor(14, ratio6_1, false);
-motor motor16 = motor(16, ratio6_1, false);
-motor motor19 = motor(19, ratio6_1, false);
-motor motor17 = motor(17, ratio6_1, false);
-motor motor13 = motor(13, ratio6_1, true);
-motor motor15 = motor(15, ratio6_1, false);
-motor_group leftDrive = motor_group(motor13, motor15);
-
-motor_group rightDrive = motor_group(motor14, motor16);
-gps GPS = gps(2, -127, -165, distanceUnits::mm, 180);
-smartdrive Drivetrain = smartdrive(leftDrive, rightDrive, GPS, 319.19, 320, 40, mm, 1);
-digital_out clamp = digital_out(Brain.ThreeWirePort.G);
-digital_out doinker = digital_out(Brain.ThreeWirePort.H);
-motor intake = motor(PORT8, ratio18_1, false);
+motor leftMotorA = motor(PORT4, ratio6_1, true);
+motor leftMotorB = motor(PORT3, ratio6_1, true);
+motor leftMotorC = motor(PORT1, ratio6_1, true);
+motor rightMotorA = motor(PORT14, ratio6_1, false);
+motor rightMotorB = motor(PORT12, ratio6_1, false);
+motor rightMotorC = motor(PORT11, ratio6_1, false);
+motor_group leftDrive = motor_group(leftMotorA, leftMotorB, leftMotorC);
+motor_group rightDrive = motor_group(rightMotorA, rightMotorB, rightMotorC);
+inertial imu = inertial(PORT6);
+gps GPS = gps(PORT17, 100, 0, distanceUnits::mm, 90);
+smartdrive Drivetrain = smartdrive(leftDrive, rightDrive, imu, 219.43, 254, 254, mm, 1);
+digital_out clamp = digital_out(Brain.ThreeWirePort.B);
+digital_out doinker = digital_out(Brain.ThreeWirePort.C);
+motor intake = motor(PORT19, ratio18_1, false);
+motor arm = motor(PORT7, ratio18_1, true);
 #else
 #pragma message("building for the worker")
 // things for 15-inch
-motor left1 = motor(18, ratio18_1, false);
-motor left2 = motor(19, ratio18_1, true);
-motor left3 = motor(20, ratio18_1, true);
-motor_group leftDrive = motor_group(left1, left2, left3);
-motor right1 = motor(15, ratio18_1, false);
-motor right2 = motor(16, ratio18_1, true);
-motor right3 = motor(17, ratio18_1, false);
-motor_group rightDrive = motor_group(left1, left2, left3);
-gps GPS = gps(PORT7, -127, -165, distanceUnits::mm, 180);
-smartdrive Drivetrain = smartdrive(leftDrive, rightDrive, GPS, 319.19, 320, 40, mm, 1);
+motor leftMotorA = motor(PORT7, ratio6_1, true);
+motor leftMotorB = motor(PORT8, ratio6_1, true);
+motor leftMotorC = motor(PORT9, ratio6_1, true);
+motor rightMotorA = motor(PORT4, ratio6_1, false);
+motor rightMotorB = motor(PORT5, ratio6_1, false);
+motor rightMotorC = motor(PORT6, ratio6_1, false);
+motor_group leftDrive = motor_group(leftMotorA, leftMotorB, leftMotorC);
+motor_group rightDrive = motor_group(rightMotorA, rightMotorB, rightMotorC);
+inertial imu = inertial(PORT3);
+gps GPS = gps(PORT18, -55, 50, distanceUnits::mm, 0.0);
+smartdrive Drivetrain = smartdrive(leftDrive, rightDrive, imu, 219.43, 254, 254, mm, 1);
+
 digital_out clamp = digital_out(Brain.ThreeWirePort.A);
 digital_out doinker = digital_out(Brain.ThreeWirePort.B);
-motor intake = motor(PORT8, ratio18_1, false);
-ai::robot_link link(PORT10, "robot_32456_1", linkType::worker);
+
+motor intakeMotorA = motor(PORT2, ratio18_1, false);
+motor intakeMotorB = motor(PORT10, ratio18_1, true);
+motor_group intake = motor_group(intakeMotorA, intakeMotorB);
+
+ai::robot_link link(PORT20, "robot_32456_1", linkType::worker);
 #endif
 
 // functions
@@ -115,31 +122,18 @@ void auto_Isolation(void)
 
 void auto_Interaction(void)
 {
-  Drivetrain.setDriveVelocity(50, percentUnits::pct);
-  Drivetrain.drive(forward);
-  //turnTo(10.0, 1.0, 50);
-  // leftDrive.spinFor(5, sec);
-  // rightDrive.spinFor(5, sec);
-
-  // motor13.spinFor(1, sec);
-  // wait(1, sec);
-  // motor14.spinFor(1, sec);
-  // wait(1, sec);
-  // motor15.spinFor(1, sec);
-  // wait(1, sec);
-  // motor16.spinFor(1, sec);
-  // wait(1, sec);
-  // motor17.spinFor(1, sec);
-  // wait(1, sec);
-  // motor19.spinFor(1, sec);
-  // wait(1, sec);
-  // while (true)
-  // {
-  //   grab_goal();
-  //   repeat(6)
+  Drivetrain.setDriveVelocity(25, percentUnits::pct);
+  Drivetrain.driveFor(100, mm);
+  // intake.spin(forward);
+  // moveToPosition(0.0, 0.0, -1);
+  // goToObject(RedRing, false);
+  //   while (true)
   //   {
-  //     score_ring();
-  //   }
+  //     grab_goal();
+  //     repeat(6)
+  //     {
+  //       score_ring();
+  //     }
 
   //   drop_in_corner();
   // }

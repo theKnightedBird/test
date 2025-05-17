@@ -70,7 +70,6 @@ void turnTo(double angle, int tolerance, int speed)
     Drivetrain.turn(direction, speed, velocityUnits::pct);
     while (1)
     {
-
         current_heading = GPS.heading();
         // Check if the current heading is within a tolerance of degrees to the target
         if (current_heading > (angle - tolerance) && current_heading < (angle + tolerance))
@@ -114,17 +113,17 @@ void moveToPosition(double target_x, double target_y, double target_theta = -1)
     // Calculate the angle to turn to face the target
     double intialHeading = calculateBearing(GPS.xPosition(distanceUnits::cm), GPS.yPosition(distanceUnits::cm), target_x, target_y);
     // Turn to face the target
-    turnTo(intialHeading, 10, 15);
+    turnTo(intialHeading, 1.0, 25);
     double distance = distanceTo(target_x, target_y);
-    // Move to the target, only 30% of total distance to account for error
-    driveFor(intialHeading, distance * 0.3, 50);
+    // Move to the target, only 50% of total distance to account for error
+    driveFor(intialHeading, distance * 0.5, 33);
 
     // Recalculate the heading and distance to the target
     double heading = calculateBearing(GPS.xPosition(distanceUnits::cm), GPS.yPosition(distanceUnits::cm), target_x, target_y);
-    turnTo(heading, 15, 10);
+    turnTo(heading, 1.0, 25);
     distance = distanceTo(target_x, target_y);
     // Move to the target, completing the remaining distance
-    driveFor(heading, distance, 20);
+    driveFor(heading, distance, 33);
 
     // Turn to the final target heading if specified, otherwise use current heading
     if (target_theta == -1)
@@ -172,14 +171,14 @@ void goToObject(OBJECT type, bool reverse = false)
     }
     // If the object is a ring, raise the arm so it can be picked up
     // Move to the detected target's position
-    if (reverse)
-    {
-        moveToPosition(target.mapLocation.x * 100, target.mapLocation.y * 100, -2);
-    }
-    else
-    {
-        moveToPosition(target.mapLocation.x * 100, target.mapLocation.y * 100);
-    }
+    // if (reverse)
+    // {
+    //     moveToPosition(target.mapLocation.x * 100, target.mapLocation.y * 100, -2);
+    // }
+    // else
+    // {
+    moveToPosition(target.mapLocation.x * 100, target.mapLocation.y * 100);
+    // }
 }
 
 // utility functio
@@ -239,4 +238,4 @@ void drop_in_corner(void)
     Drivetrain.driveFor(10, distanceUnits::cm, true);
 }
 
-// Function to grab a ring when the arm is positioned over 
+// Function to grab a ring when the arm is positioned over
