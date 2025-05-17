@@ -1,13 +1,17 @@
+#pragma once
+#include "vantadrive.h"
+
 using namespace vex;
 
 extern brain Brain;
 
 extern bool isRed;
+extern double kP;
 
 extern motor_group leftDrive;
 extern motor_group rightDrive;
 extern gps GPS;
-extern smartdrive Drivetrain;
+extern vantadrive Drivetrain;
 extern digital_out clamp;
 extern digital_out doinker;
 extern motor intake;

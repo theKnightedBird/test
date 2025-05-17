@@ -10,6 +10,7 @@
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // ---- END VEXCODE CONFIGURED DEVICES ----
 #include "ai_functions.h"
+#include "robot-config.h"
 
 using namespace vex;
 
@@ -35,6 +36,7 @@ ai::jetson jetson_comms;
 #define MANAGER_ROBOT 1
 // Change to true
 bool isRed = false;
+double kP = 2.5;
 
 #if defined(MANAGER_ROBOT)
 #pragma message("building for the manager")
@@ -49,8 +51,8 @@ motor rightMotorC = motor(PORT11, ratio6_1, false);
 motor_group leftDrive = motor_group(leftMotorA, leftMotorB, leftMotorC);
 motor_group rightDrive = motor_group(rightMotorA, rightMotorB, rightMotorC);
 inertial imu = inertial(PORT6);
-gps GPS = gps(PORT17, 100, 0, distanceUnits::mm, 90);
-smartdrive Drivetrain = smartdrive(leftDrive, rightDrive, imu, 219.43, 254, 254, mm, 1);
+gps GPS = gps(PORT17, 100, 0, distanceUnits::mm, 270);
+vantadrive Drivetrain = vantadrive(leftDrive, rightDrive, GPS);
 digital_out clamp = digital_out(Brain.ThreeWirePort.B);
 digital_out doinker = digital_out(Brain.ThreeWirePort.C);
 motor intake = motor(PORT19, ratio18_1, false);
@@ -122,9 +124,9 @@ void auto_Isolation(void)
 
 void auto_Interaction(void)
 {
-  Drivetrain.setDriveVelocity(25, percentUnits::pct);
-  Drivetrain.driveFor(100, mm);
-  // intake.spin(forward);
+  // Drivetrain.driveFor(100, mm);
+  //  intake.spin(forward);
+  Drivetrain.pointTowards(0.0 ,0.0);
   // moveToPosition(0.0, 0.0, -1);
   // goToObject(RedRing, false);
   //   while (true)

@@ -42,8 +42,9 @@ void drop_in_corner(void);
 // Drives to the closest specified object
 void goToObject(OBJECT type, bool reverse);
 
+
 // Turns the robot to a specific angle with given tolerance and speed
-void turnTo(double angle, int tolerance, int speed);
+void turnTo(double targetAngle);
 
 // Drives the robot in a specified heading for a given distance and speed
 void driveFor(int heading, double distance, int speed);
