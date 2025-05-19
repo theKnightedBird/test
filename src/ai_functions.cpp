@@ -10,44 +10,12 @@
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 
-#include "vex.h"
 #include "ai_functions.h"
 #include <string>
 #include <iostream>
 using namespace vex;
 using namespace std;
 
-// Function to drive to an object based on detection
-// void goToObject(OBJECT type, bool reverse = false)
-// {
-//     DETECTION_OBJECT target = findTarget(type);
-//     // If no target found, turn and try to find again
-//     if (target.mapLocation.x == 0 && target.mapLocation.y == 0)
-//     {
-//         Drivetrain.turnFor(45, rotationUnits::deg, 50, velocityUnits::pct);
-//         target = findTarget(0);
-//     }
-//     // If the object is a ring, raise the arm so it can be picked up
-//     // Move to the detected target's position
-//     // if (reverse)
-//     // {
-//     //     moveToPosition(target.mapLocation.x * 100, target.mapLocation.y * 100, -2);
-//     // }
-//     // else
-//     // {
-//     moveToPosition(target.mapLocation.x * 100, target.mapLocation.y * 100);
-//     // }
-// }
-
-// utility functio
-
-// clamps on a goal
-// TODO: check if we actually have a goal
-// void grab_goal(void)
-// {
-//     goToObject(MobileGoal, true);
-//     clamp.set(true);
-// }
 
 // // scores a ring
 // // TODO: add sensor logic when they put on the sensor

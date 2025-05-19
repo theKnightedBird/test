@@ -35,8 +35,7 @@ ai::jetson jetson_comms;
 // Comment out the following definition to build for the worker robot
 #define MANAGER_ROBOT 1
 // Change to true
-bool isRed = false;
-double kP = 2.5;
+bool isRed = true;
 
 #if defined(MANAGER_ROBOT)
 #pragma message("building for the manager")
@@ -50,13 +49,13 @@ motor rightMotorB = motor(PORT12, ratio6_1, false);
 motor rightMotorC = motor(PORT11, ratio6_1, false);
 motor_group leftDrive = motor_group(leftMotorA, leftMotorB, leftMotorC);
 motor_group rightDrive = motor_group(rightMotorA, rightMotorB, rightMotorC);
-inertial imu = inertial(PORT6);
-gps GPS = gps(PORT17, 100, 0, distanceUnits::mm, 270);
+gps GPS = gps(PORT17, 100, 0, distanceUnits::mm, 90);
 vantadrive Drivetrain = vantadrive(leftDrive, rightDrive, GPS);
 digital_out clamp = digital_out(Brain.ThreeWirePort.B);
 digital_out doinker = digital_out(Brain.ThreeWirePort.C);
 motor intake = motor(PORT19, ratio18_1, false);
 motor arm = motor(PORT7, ratio18_1, true);
+
 #else
 #pragma message("building for the worker")
 // things for 15-inch
@@ -126,19 +125,14 @@ void auto_Interaction(void)
 {
   // Drivetrain.driveFor(100, mm);
   //  intake.spin(forward);
-  Drivetrain.pointTowards(0.0 ,0.0);
-  // moveToPosition(0.0, 0.0, -1);
-  // goToObject(RedRing, false);
-  //   while (true)
-  //   {
-  //     grab_goal();
-  //     repeat(6)
-  //     {
-  //       score_ring();
-  //     }
-
-  //   drop_in_corner();
-  // }
+  // Drivetrain.setSpeeds(200.0, 200.0);
+  // Drivetrain.turn(0.0);
+  // Drivetrain.pointTowards(0.0, 0.0);
+  // Drivetrain.goTo(0.0, 0.0);
+  // Drivetrain.goTo(1000, -1500, true);
+  intake.setVelocity(600, rpm);
+  intake.spin(fwd);
+  Drivetrain.goTo(RedRing);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -160,6 +154,8 @@ void autonomousMain(void)
   // When the field goes enabled for the second time this task will start again
   // and we will enter the interaction period.
   // ..........................................................................
+
+  Drivetrain.calibrate();
 
   if (firstAutoFlag)
     auto_Isolation();

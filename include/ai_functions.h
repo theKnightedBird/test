@@ -10,15 +10,11 @@
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 
+#pragma once
 #include <vex.h>
 #include <robot-config.h>
 
-enum OBJECT {
-    MobileGoal,
-    RedRing,
-    BlueRing,
-    BothRings
-};
+
 
 using namespace vex;
 

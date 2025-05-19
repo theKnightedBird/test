@@ -7,6 +7,7 @@
 /*                                                                            */
 /*----------------------------------------------------------------------------*/
 //
+#pragma once
 #include "math.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,5 +30,12 @@
 
 extern ai::jetson      jetson_comms;
 extern ai::robot_link  link;
+
+enum OBJECT {
+    MobileGoal,
+    RedRing,
+    BlueRing,
+    BothRings
+};
 
 extern int dashboardTask( void );

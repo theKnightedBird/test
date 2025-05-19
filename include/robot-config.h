@@ -6,7 +6,6 @@ using namespace vex;
 extern brain Brain;
 
 extern bool isRed;
-extern double kP;
 
 extern motor_group leftDrive;
 extern motor_group rightDrive;
