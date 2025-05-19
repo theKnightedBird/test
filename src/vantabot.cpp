@@ -4,29 +4,27 @@ using namespace vex;
 
 vantabot::vantabot(
     vantadrive &d,
-    digital_out &c,
-    motor_group &i,
-    optical &o,
-    bool red) : drive(d), clamp(c), intake(i), intakeSensor(o), isRed(red) {}
+    intaker &i,
+    digital_out &c) : drive(d), intake(i), clamper(c) {}
 
 void vantabot::grabGoal()
 {
     drive.reverseInto(MobileGoal);
-    clamp.set(true);
+    clamper.set(true);
 }
 
 void vantabot::findAndScoreRing()
 {
-    OBJECT ringType = isRed ? RedRing : BlueRing;
-    intake.spin(forward);
-    drive.driveTo(ringType);
-
+    intake.intake();
+    drive.driveTo(allianceRing);
+    wait(3, sec);
+    intake.stop();
 }
 
 void vantabot::scoreInPositiveCorner()
 {
-    drive.driveTo(isRed ? 1500 : -1500, -1500);
-    clamp.set(false);
+    drive.driveTo(allianceRing == RedRing ? 1500 : -1500, -1500);
+    clamper.set(false);
     drive.reverseFor(100);
     drive.driveFor(100);
 }

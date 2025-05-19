@@ -35,7 +35,7 @@ void vantadrive::setSpeeds(double moveSpeed, double turnSpeed)
     double rightSpeed = moveSpeed - turnSpeed;
 
     // desat the speeds
-    double desaturateFator = fmax(1.0, fmax(fabs(leftSpeed), fabs(rightSpeed)));
+    double desaturateFator = fmax(100.0, fmax(fabs(leftSpeed), fabs(rightSpeed)));
     leftSpeed /= desaturateFator;
     rightSpeed /= desaturateFator;
 
@@ -145,7 +145,7 @@ void vantadrive::driveTo(OBJECT type)
     DETECTION_OBJECT target = findTarget(type);
     while (target.mapLocation.x == 0 && target.mapLocation.y == 0)
     {
-        turnTo(targetHeading + 10);
+        turnFor(10);
         wait(50, msec);
         target = findTarget(type);
     }
@@ -192,7 +192,7 @@ void vantadrive::reverseInto(OBJECT type)
     DETECTION_OBJECT target = findTarget(type);
     while (target.mapLocation.x == 0 && target.mapLocation.y == 0)
     {
-        turnTo(targetHeading + 10);
+        turnFor(10);
         wait(50, msec);
         target = findTarget(type);
     }

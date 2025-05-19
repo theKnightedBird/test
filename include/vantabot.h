@@ -1,20 +1,19 @@
 #pragma once
 #include <vex.h>
 #include "vantadrive.h"
+#include "intaker.h"
 
 using namespace vex;
 
 class vantabot
 {
     vantadrive &drive;
-    digital_out &clamp;
-    motor_group &intake;
-    optical &intakeSensor;
+    intaker &intake;
+    digital_out &clamper;
     bool hasGoal;
 
 public:
-    bool isRed;
-    vantabot(vantadrive &d, digital_out &c, motor_group &i, optical &o, bool red);
+    vantabot(vantadrive &d, intaker &i, digital_out &c);
     void grabGoal();
     void findAndScoreRing();
     void scoreInPositiveCorner();

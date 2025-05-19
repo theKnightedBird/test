@@ -10,7 +10,7 @@ extern bool isRed;
 extern motor_group leftDrive;
 extern motor_group rightDrive;
 extern gps GPS;
-extern vantadrive Drivetrain;
+extern vantadrive drive;
 extern digital_out clamp;
 extern digital_out doinker;
 extern motor intake;

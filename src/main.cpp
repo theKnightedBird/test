@@ -10,6 +10,7 @@
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // ---- END VEXCODE CONFIGURED DEVICES ----
 #include "robot-config.h"
+#include "vantabot.h"
 
 using namespace vex;
 
@@ -23,6 +24,7 @@ competition Competition;
 // data from the Jetson nano
 //
 ai::jetson jetson_comms;
+OBJECT allianceRing = RedRing;
 
 /*----------------------------------------------------------------------------*/
 // Create a robot_link on PORT1 using the unique name robot_32456_1
@@ -33,13 +35,12 @@ ai::jetson jetson_comms;
 // manager and worker robots
 // Comment out the following definition to build for the worker robot
 #define MANAGER_ROBOT 1
-// Change to true
-bool isRed = true;
+// Change to redRing if we're red, and blueRing if we're blue
 
 #if defined(MANAGER_ROBOT)
 #pragma message("building for the manager")
 ai::robot_link link(PORT15, "robot_32456_1", linkType::manager);
-// things for 24-inch
+
 motor leftMotorA = motor(PORT4, ratio6_1, true);
 motor leftMotorB = motor(PORT3, ratio6_1, true);
 motor leftMotorC = motor(PORT1, ratio6_1, true);
@@ -49,11 +50,16 @@ motor rightMotorC = motor(PORT11, ratio6_1, false);
 motor_group leftDrive = motor_group(leftMotorA, leftMotorB, leftMotorC);
 motor_group rightDrive = motor_group(rightMotorA, rightMotorB, rightMotorC);
 gps GPS = gps(PORT17, 100, 0, distanceUnits::mm, 90);
-vantadrive Drivetrain = vantadrive(leftDrive, rightDrive, GPS);
-digital_out clamp = digital_out(Brain.ThreeWirePort.B);
-digital_out doinker = digital_out(Brain.ThreeWirePort.C);
-motor intake = motor(PORT19, ratio18_1, false);
-motor arm = motor(PORT7, ratio18_1, true);
+vantadrive drive = vantadrive(leftDrive, rightDrive, GPS);
+
+motor intake_motor = motor(PORT19, ratio18_1, false);
+motor_group intake_group = motor_group(intake_motor);
+optical intake_sensor = optical(PORT16);
+intaker intake = intaker(intake_group, intake_sensor);
+
+digital_out clamper = digital_out(Brain.ThreeWirePort.B);
+
+vantabot bot = vantabot(drive, intake, clamper);
 
 #else
 #pragma message("building for the worker")
@@ -122,16 +128,8 @@ void auto_Isolation(void)
 
 void auto_Interaction(void)
 {
-  // Drivetrain.driveFor(100, mm);
-  //  intake.spin(forward);
-  // Drivetrain.setSpeeds(200.0, 200.0);
-  // Drivetrain.turn(0.0);
-  // Drivetrain.pointTowards(0.0, 0.0);
-  // Drivetrain.goTo(0.0, 0.0);
-  // Drivetrain.goTo(1000, -1500, true);
-  intake.setVelocity(600, rpm);
-  intake.spin(fwd);
-  Drivetrain.driveTo(RedRing);
+  bot.grabGoal();
+  bot.findAndScoreRing();
 }
 
 /*---------------------------------------------------------------------------*/
@@ -154,7 +152,7 @@ void autonomousMain(void)
   // and we will enter the interaction period.
   // ..........................................................................
 
-  Drivetrain.calibrate();
+  drive.calibrate();
 
   if (firstAutoFlag)
     auto_Isolation();
