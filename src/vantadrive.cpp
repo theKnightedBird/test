@@ -45,8 +45,8 @@ void vantadrive::setSpeeds(double moveSpeed, double turnSpeed)
 
 void vantadrive::stopDrive()
 {
-    left.stop();
-    right.stop();
+    left.stop(brake);
+    right.stop(brake);
 }
 
 double vantadrive::distanceTo(double targetX, double targetY)
@@ -63,7 +63,7 @@ double vantadrive::bearingTo(double targetX, double targetY)
     return angle;
 }
 
-void vantadrive::turn(double targetAngle)
+void vantadrive::turnTo(double targetAngle)
 {
     targetHeading = targetAngle;
     turnController.reset();
@@ -83,7 +83,7 @@ void vantadrive::turnTo(double targetX, double targetY)
     double dy = targetY - GPS.yPosition();
     double angle = atan2(dy, dx) * 180 / M_PI;
     angle = fmod(450 - angle, 360);
-    turn(angle);
+    turnTo(angle);
 }
 
 void vantadrive::turnAwayFrom(double targetX, double targetY)
@@ -92,30 +92,49 @@ void vantadrive::turnAwayFrom(double targetX, double targetY)
     double dy = targetY - GPS.yPosition();
     double angle = atan2(dy, dx) * 180 / M_PI;
     angle = fmod(450 - angle, 360);
-    turn(angle + 180);
+    turnTo(angle + 180);
 }
 
-void vantadrive::drive(double targetSpeed)
+void vantadrive::turnFor(double angle)
 {
-    // holds angle with pid
-    double angle_error = fmod(targetHeading - GPS.heading() + 180, 360) - 180;
-    setSpeeds(targetSpeed, holdController.calculate(angle_error));
+    turnTo(targetHeading + angle);
+}
+
+void vantadrive::spinForTime(double power, double time)
+{
+    double start_time = timer::system();
+    while (timer::system() - start_time < time)
+    {
+        setSpeeds(0.0, power);
+    }
 }
 
 void vantadrive::driveTo(double targetX, double targetY)
 {
     turnTo(targetX, targetY);
+    driveController.reset();
+    holdController.reset();
+    double angle_error;
     while (distanceTo(targetX, targetY) > 100)
     {
         targetHeading = bearingTo(targetX, targetY);
-        drive(driveController.calculate(distanceTo(targetX, targetY)));
+        angle_error = fmod(targetHeading - GPS.heading() + 180, 360) - 180;
+        setSpeeds(
+            driveController.calculate(distanceTo(targetX, targetY)),
+            holdController.calculate(angle_error));
         wait(5, msec);
     }
     turnTo(targetX, targetY);
+    driveController.reset();
+    holdController.reset();
+    double angle_error;
     while (distanceTo(targetX, targetY) > 10)
     {
         targetHeading = bearingTo(targetX, targetY);
-        drive(driveController.calculate(distanceTo(targetX, targetY)));
+        angle_error = fmod(targetHeading - GPS.heading() + 180, 360) - 180;
+        setSpeeds(
+            driveController.calculate(distanceTo(targetX, targetY)),
+            holdController.calculate(angle_error));
         wait(5, msec);
     }
     stopDrive();
@@ -126,27 +145,44 @@ void vantadrive::driveTo(OBJECT type)
     DETECTION_OBJECT target = findTarget(type);
     while (target.mapLocation.x == 0 && target.mapLocation.y == 0)
     {
-        turn(targetHeading + 10);
+        turnTo(targetHeading + 10);
         wait(50, msec);
         target = findTarget(type);
     }
     driveTo(target.mapLocation.x * 1000, target.mapLocation.y * 1000);
 }
 
+void vantadrive::driveFor(double dist)
+{
+    driveTo(100 * cos(targetHeading), 100 * sin(targetHeading));
+}
+
 void vantadrive::reverseInto(double targetX, double targetY)
 {
     turnAwayFrom(targetX, targetY);
+    driveController.reset();
+    holdController.reset();
+    double angle_error;
     while (distanceTo(targetX, targetY) > 100)
     {
         targetHeading = bearingTo(targetX, targetY) + 180;
-        drive(-driveController.calculate(distanceTo(targetX, targetY)));
+        angle_error = fmod(targetHeading - GPS.heading() + 180, 360) - 180;
+        setSpeeds(
+            driveController.calculate(distanceTo(targetX, targetY)),
+            holdController.calculate(angle_error));
         wait(5, msec);
     }
     turnAwayFrom(targetX, targetY);
+    driveController.reset();
+    holdController.reset();
+    double angle_error;
     while (distanceTo(targetX, targetY) > 10)
     {
         targetHeading = bearingTo(targetX, targetY) + 180;
-        drive(-driveController.calculate(distanceTo(targetX, targetY)));
+        angle_error = fmod(targetHeading - GPS.heading() + 180, 360) - 180;
+        setSpeeds(
+            driveController.calculate(distanceTo(targetX, targetY)),
+            holdController.calculate(angle_error));
         wait(5, msec);
     }
     stopDrive();
@@ -156,9 +192,13 @@ void vantadrive::reverseInto(OBJECT type)
     DETECTION_OBJECT target = findTarget(type);
     while (target.mapLocation.x == 0 && target.mapLocation.y == 0)
     {
-        turn(targetHeading + 10);
+        turnTo(targetHeading + 10);
         wait(50, msec);
         target = findTarget(type);
     }
     reverseInto(target.mapLocation.x * 1000, target.mapLocation.y * 1000);
+}
+void vantadrive::reverseFor(double dist)
+{
+    reverseInto(-100 * cos(targetHeading), -100 * sin(targetHeading));
 }

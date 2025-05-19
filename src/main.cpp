@@ -9,7 +9,6 @@
 
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // ---- END VEXCODE CONFIGURED DEVICES ----
-#include "ai_functions.h"
 #include "robot-config.h"
 
 using namespace vex;
@@ -132,7 +131,7 @@ void auto_Interaction(void)
   // Drivetrain.goTo(1000, -1500, true);
   intake.setVelocity(600, rpm);
   intake.spin(fwd);
-  Drivetrain.goTo(RedRing);
+  Drivetrain.driveTo(RedRing);
 }
 
 /*---------------------------------------------------------------------------*/
