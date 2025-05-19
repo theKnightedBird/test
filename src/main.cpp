@@ -24,7 +24,6 @@ competition Competition;
 // data from the Jetson nano
 //
 ai::jetson jetson_comms;
-OBJECT allianceRing = RedRing;
 
 /*----------------------------------------------------------------------------*/
 // Create a robot_link on PORT1 using the unique name robot_32456_1
@@ -36,6 +35,7 @@ OBJECT allianceRing = RedRing;
 // Comment out the following definition to build for the worker robot
 #define MANAGER_ROBOT 1
 // Change to redRing if we're red, and blueRing if we're blue
+OBJECT allianceRing = RedRing;
 
 #if defined(MANAGER_ROBOT)
 #pragma message("building for the manager")
@@ -63,7 +63,8 @@ vantabot bot = vantabot(drive, intake, clamper);
 
 #else
 #pragma message("building for the worker")
-// things for 15-inch
+ai::robot_link link(PORT20, "robot_32456_1", linkType::worker);
+
 motor leftMotorA = motor(PORT7, ratio6_1, true);
 motor leftMotorB = motor(PORT8, ratio6_1, true);
 motor leftMotorC = motor(PORT9, ratio6_1, true);
@@ -72,21 +73,19 @@ motor rightMotorB = motor(PORT5, ratio6_1, false);
 motor rightMotorC = motor(PORT6, ratio6_1, false);
 motor_group leftDrive = motor_group(leftMotorA, leftMotorB, leftMotorC);
 motor_group rightDrive = motor_group(rightMotorA, rightMotorB, rightMotorC);
-inertial imu = inertial(PORT3);
 gps GPS = gps(PORT18, -55, 50, distanceUnits::mm, 0.0);
-smartdrive Drivetrain = smartdrive(leftDrive, rightDrive, imu, 219.43, 254, 254, mm, 1);
+vantadrive drive = vantadrive(leftDrive, rightDrive, GPS);
 
-digital_out clamp = digital_out(Brain.ThreeWirePort.A);
-digital_out doinker = digital_out(Brain.ThreeWirePort.B);
+motor intake_motor_A = motor(PORT2, ratio18_1, false);
+motor intake_motor_B = motor(PORT10, ratio18_1, true);
+motor_group intake_group = motor_group(intake_motor_A, intake_motor_B);
+optical intake_sensor = optical(PORT16);
+intaker intake = intaker(intake_group, intake_sensor);
 
-motor intakeMotorA = motor(PORT2, ratio18_1, false);
-motor intakeMotorB = motor(PORT10, ratio18_1, true);
-motor_group intake = motor_group(intakeMotorA, intakeMotorB);
+digital_out clamper = digital_out(Brain.ThreeWirePort.A);
 
-ai::robot_link link(PORT20, "robot_32456_1", linkType::worker);
+vantabot bot = vantabot(drive, intake, clamper);
 #endif
-
-// functions
 
 /*---------------------------------------------------------------------------*/
 /*                                                                           */
@@ -128,8 +127,21 @@ void auto_Isolation(void)
 
 void auto_Interaction(void)
 {
-  bot.grabGoal();
-  bot.findAndScoreRing();
+  while (true)
+  {
+    if (!bot.hasGoal())
+    {
+      bot.grabGoal();
+    }
+    else if (intake.getNumRingsInGoal() < 6)
+    {
+      bot.findAndScoreRing();
+    }
+    else
+    {
+      bot.scoreInPositiveCorner();
+    }
+  }
 }
 
 /*---------------------------------------------------------------------------*/
@@ -159,7 +171,7 @@ void autonomousMain(void)
   else
     auto_Interaction();
 
-  firstAutoFlag = false;
+  firstAutoFlag = true;
 }
 
 int main()
@@ -176,6 +188,7 @@ int main()
 
   // Set up callbacks for autonomous and driver control periods.
   Competition.autonomous(autonomousMain);
+  Competition.drivercontrol(autonomousMain);
 
   // print through the controller to the terminal (vexos 1.0.12 is needed)
   // As USB is tied up with Jetson communications we cannot use
@@ -183,7 +196,7 @@ int main()
   // then this can be used as a direct connection to USB on the controller
   // when using VEXcode.
   //
-  // FILE *fp = fopen("/dev/serial2","wb");
+  FILE *fp = fopen("/dev/serial2", "wb");
   this_thread::sleep_for(loop_time);
 
   while (1)

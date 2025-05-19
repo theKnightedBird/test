@@ -1,8 +1,8 @@
 #include "intaker.h"
 
 intaker::intaker(motor_group &m, optical &o) : intake_motor(m),
-                                             intake_sensor(o),
-                                             rejectThread(_startPeriodic, this)
+                                               intake_sensor(o),
+                                               rejectThread(_startPeriodic, this)
 {
 }
 
@@ -11,9 +11,19 @@ void intaker::periodic()
     double hue;
     while (true)
     {
+        hue = intake_sensor.hue();
+        if (allianceRing == RedRing && hue >= 200 && hue <= 230)
+            hasRing = true;
+        else if (allianceRing == BlueRing && (hue >= 340 && hue <= 359 || hue <= 20 && hue >= 0))
+            hasRing = true;
+        else
+        {
+            if (hasRing == true)
+                numRingsInGoal++;
+            hasRing = false;
+        }
         if (runIntake)
         {
-            hue = intake_sensor.hue();
             intake_motor.spin(fwd, 50, pct);
             wait(250, msec);
             // deal with jams
@@ -45,7 +55,27 @@ void intaker::_startPeriodic(void *obj)
     static_cast<intaker *>(obj)->periodic();
 }
 
+bool intaker::holdingRing()
+{
+    return hasRing;
+}
+
+double intaker::getNumRingsInGoal()
+{
+    return numRingsInGoal;
+}
+
+void intaker::resetCount()
+{
+    numRingsInGoal = 0;
+}
+
 void intaker::intake()
 {
     runIntake = true;
+}
+
+void intaker::stop()
+{
+    runIntake = false;
 }

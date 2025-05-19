@@ -10,10 +10,14 @@ class vantabot
     vantadrive &drive;
     intaker &intake;
     digital_out &clamper;
-    bool hasGoal;
+    distance &clamp_sensor;
+    bool hasGoal = false;
 
 public:
-    vantabot(vantadrive &d, intaker &i, digital_out &c);
+    vantabot(vantadrive &d, intaker &i, digital_out &c, distance &cs);
+
+    bool hasGoal();
+
     void grabGoal();
     void findAndScoreRing();
     void scoreInPositiveCorner();
