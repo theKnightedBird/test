@@ -25,7 +25,7 @@ void vantabot::findAndScoreRing(OBJECT ring_type)
 {
     intake.intake();
     drive.driveTo(ring_type);
-    drive.drive(50, 200);
+    drive.drive(50, 100);
     drive.stopDrive();
     wait(3, sec);
     intake.stop();
@@ -36,8 +36,8 @@ void vantabot::scoreInPositiveCorner()
     drive.driveTo(allianceRing == RedRing ? 1500 : -1500, -1500);
     drive.turnTo(allianceRing == RedRing ? 45 : 135);
     clamper.set(false);
-    drive.drive(50, 300, true);
-    drive.drive(50, 300);
+    drive.drive(50, 200, true);
+    drive.drive(50, 200);
     intake.resetCount();
 }
 
