@@ -33,7 +33,7 @@ ai::jetson jetson_comms;
 // The Demo is symetrical, we send the same data and display the same status on both
 // manager and worker robots
 // Comment out the following definition to build for the worker robot
-#define MANAGER_ROBOT 1
+// #define MANAGER_ROBOT 1
 // Change to redRing if we're red, and blueRing if we're blue
 OBJECT allianceRing = RedRing;
 
@@ -50,7 +50,8 @@ motor rightMotorC = motor(PORT11, ratio6_1, false);
 motor_group leftDrive = motor_group(leftMotorA, leftMotorB, leftMotorC);
 motor_group rightDrive = motor_group(rightMotorA, rightMotorB, rightMotorC);
 gps GPS = gps(PORT17, 100, 0, distanceUnits::mm, 90);
-vantadrive drive = vantadrive(leftDrive, rightDrive, GPS);
+inertial imu = inertial(PORT6);
+vantadrive drive = vantadrive(leftDrive, rightDrive, GPS, imu);
 
 motor intake_motor = motor(PORT19, ratio18_1, false);
 motor_group intake_group = motor_group(intake_motor);
@@ -58,33 +59,36 @@ optical intake_sensor = optical(PORT16);
 intaker intake = intaker(intake_group, intake_sensor);
 
 digital_out clamper = digital_out(Brain.ThreeWirePort.B);
+distance clamperSensor = distance(PORT13);
 
-vantabot bot = vantabot(drive, intake, clamper);
+vantabot bot = vantabot(drive, intake, clamper, clamperSensor);
 
 #else
 #pragma message("building for the worker")
 ai::robot_link link(PORT20, "robot_32456_1", linkType::worker);
 
-motor leftMotorA = motor(PORT7, ratio6_1, true);
-motor leftMotorB = motor(PORT8, ratio6_1, true);
-motor leftMotorC = motor(PORT9, ratio6_1, true);
-motor rightMotorA = motor(PORT4, ratio6_1, false);
-motor rightMotorB = motor(PORT5, ratio6_1, false);
-motor rightMotorC = motor(PORT6, ratio6_1, false);
+motor leftMotorA = motor(PORT1, ratio6_1, true);
+motor leftMotorB = motor(PORT2, ratio6_1, true);
+motor leftMotorC = motor(PORT19, ratio6_1, true);
+motor rightMotorA = motor(PORT10, ratio6_1, false);
+motor rightMotorB = motor(PORT11, ratio6_1, false);
+motor rightMotorC = motor(PORT20, ratio6_1, false);
 motor_group leftDrive = motor_group(leftMotorA, leftMotorB, leftMotorC);
 motor_group rightDrive = motor_group(rightMotorA, rightMotorB, rightMotorC);
-gps GPS = gps(PORT18, -55, 50, distanceUnits::mm, 0.0);
-vantadrive drive = vantadrive(leftDrive, rightDrive, GPS);
+inertial imu = inertial(PORT17);
+gps GPS = gps(PORT3, -85, 90, distanceUnits::mm, -94.0);
+vantadrive drive = vantadrive(leftDrive, rightDrive, GPS, imu);
 
-motor intake_motor_A = motor(PORT2, ratio18_1, false);
-motor intake_motor_B = motor(PORT10, ratio18_1, true);
+motor intake_motor_A = motor(PORT8, ratio18_1, true);
+motor intake_motor_B = motor(PORT9, ratio18_1, true);
 motor_group intake_group = motor_group(intake_motor_A, intake_motor_B);
 optical intake_sensor = optical(PORT16);
 intaker intake = intaker(intake_group, intake_sensor);
 
 digital_out clamper = digital_out(Brain.ThreeWirePort.A);
+distance clamper_sens = distance(PORT5);
 
-vantabot bot = vantabot(drive, intake, clamper);
+vantabot bot = vantabot(drive, intake, clamper, clamper_sens);
 #endif
 
 /*---------------------------------------------------------------------------*/
@@ -99,20 +103,7 @@ vantabot bot = vantabot(drive, intake, clamper);
 
 void auto_Isolation(void)
 {
-  // Calibrate GPS Sensor
-  GPS.calibrate();
-  // Optional wait to allow for calibration
-  waitUntil(!(GPS.isCalibrating()));
-
-  // // Finds and moves robot to over the closest blue ring
-  // goToObject(OBJECT::BlueRing);
-  // grabRing();
-  // // Find and moves robot to the closest mobile drop
-  // // then drops the ring on the goal
-  // goToObject(OBJECT::MobileGoal);
-  // dropRing();
-  // // Back off from the goal
-  // Drivetrain.driveFor(-30, distanceUnits::cm);
+  // drive.turnTo(0, 0);
 }
 
 /*---------------------------------------------------------------------------*/
@@ -127,21 +118,34 @@ void auto_Isolation(void)
 
 void auto_Interaction(void)
 {
-  while (true)
-  {
-    if (!bot.hasGoal())
-    {
-      bot.grabGoal();
-    }
-    else if (intake.getNumRingsInGoal() < 6)
-    {
-      bot.findAndScoreRing();
-    }
-    else
-    {
-      bot.scoreInPositiveCorner();
-    }
-  }
+  drive.calibrate();
+  bot.grabGoal();
+  //  bot.findAndScoreRing(allianceRing);
+
+  // drive.driveTo(1200.0, 1200.0, true);
+  // drive.driveTo(-1200.0, 1200.0, true);
+  // drive.driveTo(-1200.0, -1200.0, true);
+  //drive.driveTo(1200.0, -1200.0);
+
+  // drive.drive(50.0, 1000.0);
+  // wait(1, sec);
+  // drive.drive(50.0, 1000.0, true);
+
+  //     while (true)
+  //     {
+  //       if (!bot.hasGoal())
+  //       {
+  //         bot.grabGoal();
+  //       }
+  //       else if (intake.getNumRingsInGoal() < 6)
+  //       {
+  //         bot.findAndScoreRing();
+  //       }
+  //       else
+  //       {
+  //         bot.scoreInPositiveCorner();
+  //       }
+  //     }
 }
 
 /*---------------------------------------------------------------------------*/
@@ -164,14 +168,9 @@ void autonomousMain(void)
   // and we will enter the interaction period.
   // ..........................................................................
 
-  drive.calibrate();
+  // drive.calibrate();
 
-  if (firstAutoFlag)
-    auto_Isolation();
-  else
-    auto_Interaction();
-
-  firstAutoFlag = true;
+  auto_Interaction();
 }
 
 int main()

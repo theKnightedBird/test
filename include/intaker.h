@@ -7,7 +7,7 @@ class intaker
 {
     motor_group &intake_motor;
     optical &intake_sensor;
-    thread rejectThread;
+    thread periodicThread;
     bool runIntake = false;
     bool hasRing = false;
     double numRingsInGoal = 0;

@@ -8,20 +8,20 @@ pid_controller::pid_controller(double kP, double kI, double kD)
     this->kI = kI;
     this->kD = kD;
     prev_error = 0;
-    prev_time = 0;
+    prev_time = timer::system() / 1000.0;
     accumulated_error = 0;
 }
 
 void pid_controller::reset()
 {
     prev_error = 0;
-    prev_time = timer::system();
+    prev_time = timer::system() / 1000.0;
     accumulated_error = 0;
 }
 
 double pid_controller::calculate(double error)
 {
-    double curr_time = timer::system() / 1000;
+    double curr_time = timer::system() / 1000.0;
     double dt = fmax(0.001, curr_time - prev_time);
     double d_error = (error - prev_error) / dt;
     accumulated_error += error * dt;

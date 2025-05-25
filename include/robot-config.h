@@ -1,5 +1,6 @@
 #pragma once
 #include "vantadrive.h"
+#include "intaker.h"
 
 using namespace vex;
 
@@ -13,7 +14,7 @@ extern gps GPS;
 extern vantadrive drive;
 extern digital_out clamp;
 extern digital_out doinker;
-extern motor intake;
+extern intaker intake;
 extern controller Controller;
 
 void vexcodeInit(void);
