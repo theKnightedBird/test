@@ -25,7 +25,8 @@ void vantabot::findAndScoreRing(OBJECT ring_type)
 {
     intake.intake();
     drive.driveTo(ring_type);
-    drive.drive(50, 300);
+    drive.drive(50, 200);
+    drive.stopDrive();
     wait(3, sec);
     intake.stop();
 }

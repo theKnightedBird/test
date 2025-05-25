@@ -40,20 +40,31 @@ void vantadrive::calibrate()
     waitUntil(jetson_comms.get_packets() > 0);
 };
 
-DETECTION_OBJECT vantadrive::findTarget(int type)
+DETECTION_OBJECT vantadrive::find_optimal_target(int type)
 {
     DETECTION_OBJECT target;
     jetson_comms.get_data(&local_map);
-    double lowestDist = 1000000;
-    // Iterate through detected objects to find the closest target of the specified type
-    for (int i = 0; i < local_map.detectionCount; i++)
+    double lowest_score = 1000000;
+    double score;
+    // Iterate through detected objects to find the best target of the specified type
+    for (DETECTION_OBJECT game_piece : local_map.detections)
     {
-        double distance = distanceTo(local_map.detections[i].mapLocation.x, local_map.detections[i].mapLocation.y);
-        if (distance < lowestDist && local_map.detections[i].classID == type)
-        {
-            target = local_map.detections[i];
-            lowestDist = distance;
-        }
+        // set score to the distance
+        score = distanceTo(game_piece.mapLocation.x, game_piece.mapLocation.y);
+        // don't pick up game pieces that aren't the game peice you want
+        if (game_piece.classID != type)
+            continue;
+        // don't pick up anything too far away, just turn and look for a better one instead.
+        if (distanceTo(game_piece.mapLocation.x, game_piece.mapLocation.y) > 3000)
+            continue;
+        // don't pick up anything outside the borders
+        if (fabs(game_piece.mapLocation.x) > 1200 || fabs(game_piece.mapLocation.y) > 1200)
+            continue;
+        // penalize game pieces close to the border
+        if (fabs(game_piece.mapLocation.x) > 1100 || fabs(game_piece.mapLocation.y) > 1100)
+            score *= 2;
+        // penalize game pieces close to the poles
+        
     }
     return target;
 }
@@ -80,7 +91,7 @@ void vantadrive::stopDrive()
 
 double vantadrive::distanceTo(double targetX, double targetY)
 {
-    return sqrt(pow(targetX - GPS.xPosition(mm), 2) + pow(targetY - GPS.yPosition(mm), 2));
+    return distance_between(vec2(GPS.xPosition(), GPS.yPosition()), vec2(targetX, targetY));
 }
 
 double vantadrive::bearingTo(double targetX, double targetY)
@@ -184,11 +195,11 @@ void vantadrive::driveTo(double targetX, double targetY, bool reverse, double to
 
 void vantadrive::driveTo(OBJECT type, bool reverse, double tolerance, bool doSecondPass)
 {
-    DETECTION_OBJECT target = findTarget(type);
-    while (target.mapLocation.x == 0 && target.mapLocation.y == 0)
+    DETECTION_OBJECT target = find_optimal_target(type);
+    while (target.mapLocation.x == 0.0 && target.mapLocation.y == 0.0)
     {
         turnFor(10);
-        target = findTarget(type);
+        target = find_optimal_target(type);
     }
     driveTo(target.mapLocation.x * 1000, target.mapLocation.y * 1000, reverse, tolerance, doSecondPass);
 }

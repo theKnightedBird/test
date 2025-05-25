@@ -120,12 +120,13 @@ void auto_Interaction(void)
 {
   drive.calibrate();
   bot.grabGoal();
-  //  bot.findAndScoreRing(allianceRing);
+  wait(1, sec);
+  bot.findAndScoreRing(allianceRing);
 
   // drive.driveTo(1200.0, 1200.0, true);
   // drive.driveTo(-1200.0, 1200.0, true);
   // drive.driveTo(-1200.0, -1200.0, true);
-  //drive.driveTo(1200.0, -1200.0);
+  // drive.driveTo(1200.0, -1200.0);
 
   // drive.drive(50.0, 1000.0);
   // wait(1, sec);

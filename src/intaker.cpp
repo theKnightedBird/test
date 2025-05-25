@@ -28,7 +28,7 @@ void intaker::periodic()
         // logic for intaking
         if (runIntake)
         {
-            intake_motor.spin(fwd, 100, pct);
+            intake_motor.spin(fwd, 75, pct);
             wait(250, msec);
             // // deal with jams
             // if (intake_motor.velocity(pct) < 5)

@@ -1,7 +1,7 @@
 #pragma once
 #include <vex.h>
 #include "pid_controller.h"
-#include "util_functions.h"
+#include "util.h"
 
 using namespace vex;
 
@@ -26,7 +26,7 @@ public:
 
     void calibrate();
 
-    DETECTION_OBJECT findTarget(int type);
+    DETECTION_OBJECT find_optimal_target(int type);
 
     void setSpeeds(double moveSpeed, double turnSpeed);
     void stopDrive();
