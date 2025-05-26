@@ -126,6 +126,8 @@ void auto_Interaction(void)
   bot.findAndScoreRing(allianceRing);
   wait(1, sec);
   bot.findAndScoreRing(allianceRing);
+  wait(1, sec);
+  bot.scoreInPositiveCorner();
 
   // drive.driveTo(1200.0, 1200.0, true);
   // drive.driveTo(-1200.0, 1200.0, true);

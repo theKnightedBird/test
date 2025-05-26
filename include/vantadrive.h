@@ -9,7 +9,7 @@ class vantadrive
 {
     motor_group &left;
     motor_group &right;
-    gps &GPS;
+
     inertial &imu;
     thread periodicThread;
     AI_RECORD local_map;
@@ -19,6 +19,7 @@ class vantadrive
     pid_controller holdController = pid_controller(0.3, 0.0, 0.0);
 
 public:
+    gps &GPS;
     vantadrive(vex::motor_group &l, vex::motor_group &r, vex::gps &gps, vex::inertial &imu);
 
     void periodic();

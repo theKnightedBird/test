@@ -1,5 +1,11 @@
 #include "util.h"
 
+vec2::vec2()
+{
+    this->x = 0;
+    this->y = 0;
+}
+
 vec2::vec2(double x, double y)
 {
     this->x = x;
@@ -43,13 +49,16 @@ double distance_from_line_segment(vec2 start, vec2 end, vec2 point)
     vec2 line = end - start;
     vec2 point_trans = point - start;
     vec2 projection = line * (dot(point_trans, line) / pow(line.mag(), 2));
-    if (dot(point_trans, line) / pow(line.mag(), 2) <= 0) // extends past start
+    if (dot(point_trans, line) / line.mag() <= 0) // extends past start
     {
         return distance_between(start, point);
-    } else if (dot(point_trans, line) / pow(line.mag(), 2) >= 1) // extends past end
+    }
+    else if (dot(point_trans, line) / line.mag() >= 1) // extends past end
     {
         return distance_between(end, point);
-    } else {
+    }
+    else
+    {
         return (point_trans - projection).mag();
     }
 }

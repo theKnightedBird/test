@@ -21,4 +21,5 @@ public:
     void findAndScoreRing(OBJECT ring_type);
     void scoreInPositiveCorner();
     void tipOverGoal();
+    void go_to_sector();
 };

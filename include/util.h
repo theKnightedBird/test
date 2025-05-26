@@ -6,6 +6,7 @@ class vec2
 public:
     double x;
     double y;
+    vec2();
     vec2(double x, double y);
     double mag();
     vec2 operator+(vec2 v);

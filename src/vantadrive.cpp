@@ -44,11 +44,13 @@ DETECTION_OBJECT vantadrive::find_optimal_target(int type)
 {
     DETECTION_OBJECT target = DETECTION_OBJECT();
     jetson_comms.get_data(&local_map);
-    double lowest_score = 5000;
+    double lowest_score = 20000;
     double score;
     // Iterate through detected objects to find the best target of the specified type
     for (DETECTION_OBJECT game_piece : local_map.detections)
     {
+        double x = GPS.xPosition();
+        double y = GPS.yPosition();
         double x_p = game_piece.mapLocation.x * 1000;
         double y_p = game_piece.mapLocation.y * 1000;
 
@@ -58,43 +60,49 @@ DETECTION_OBJECT vantadrive::find_optimal_target(int type)
         if (game_piece.classID != type)
             continue;
         // don't pick up anything too far away, just turn and look for a better one instead.
-        if (distanceTo(x_p, y_p) > 2000)
+        if (distanceTo(x_p, y_p) > 5000)
             continue;
         // don't pick up anything outside the borders
-        if (fabs(x_p) > 1700 || fabs(y_p) > 1700)
+        if (fabs(x_p) > 1800 || fabs(y_p) > 1800)
             continue;
         // penalize game pieces close to the border
-        if (fabs(x_p) > 1500 || fabs(y_p) > 1500)
+        if (fabs(x_p) > 1600 || fabs(y_p) > 1600)
             score *= 2;
         // disallow game pieces close to the poles
-        // if (distance_from_line_segment(
-        //         vec2(GPS.xPosition(), GPS.yPosition()),
-        //         vec2(game_piece.mapLocation.x, game_piece.mapLocation.y),
-        //         vec2(0, 600)) < 150)
-        // {
-        //     continue;
-        // }
-        // if (distance_from_line_segment(
-        //         vec2(GPS.xPosition(), GPS.yPosition()),
-        //         vec2(game_piece.mapLocation.x, game_piece.mapLocation.y),
-        //         vec2(600, 0)) < 150)
-        // {
-        //     continue;
-        // }
-        // if (distance_from_line_segment(
-        //         vec2(GPS.xPosition(), GPS.yPosition()),
-        //         vec2(game_piece.mapLocation.x, game_piece.mapLocation.y),
-        //         vec2(0, -600)) < 150)
-        // {
-        //     continue;
-        // }
-        // if (distance_from_line_segment(
-        //         vec2(GPS.xPosition(), GPS.yPosition()),
-        //         vec2(game_piece.mapLocation.x, game_piece.mapLocation.y),
-        //         vec2(-600, 0)) < 150)
-        // {
-        //     continue;
-        // }
+        if (distance_from_line_segment(
+                vec2(x, y),
+                vec2(x_p, y_p),
+                vec2(0, 600)) < 200)
+        {
+            continue;
+        }
+        if (distance_from_line_segment(
+                vec2(x, y),
+                vec2(x_p, y_p),
+                vec2(600, 0)) < 200)
+        {
+            continue;
+        }
+        if (distance_from_line_segment(
+                vec2(x, y),
+                vec2(x_p, y_p),
+                vec2(0, -600)) < 200)
+        {
+            continue;
+        }
+        if (distance_from_line_segment(
+                vec2(x, y),
+                vec2(x_p, y_p),
+                vec2(-600, 0)) < 200)
+        {
+            continue;
+        }
+        // don't go for things in the middle
+        if (fabs(x_p) < 600 && fabs(y_p) < 600)
+        {
+            continue;
+        }
+
         if (score < lowest_score)
         {
             lowest_score = score;
@@ -232,10 +240,12 @@ void vantadrive::driveTo(OBJECT type, bool reverse, double tolerance, bool doSec
 {
     turnController.reset();
     stopDrive();
+    wait(200, msec);
     DETECTION_OBJECT target = find_optimal_target(type);
     while (target.mapLocation.x == 0.0 && target.mapLocation.y == 0.0)
     {
         turnFor(60);
+        wait(200, msec);
         target = find_optimal_target(type);
     }
     driveTo(target.mapLocation.x * 1000, target.mapLocation.y * 1000, reverse, tolerance, doSecondPass);
