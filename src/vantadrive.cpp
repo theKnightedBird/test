@@ -70,30 +70,30 @@ DETECTION_OBJECT vantadrive::find_optimal_target(int type)
             score *= 2;
         // disallow game pieces close to the poles
         if (distance_from_line_segment(
-                vec2(x, y),
-                vec2(x_p, y_p),
-                vec2(0, 600)) < 200)
+                vec({x, y}),
+                vec({x_p, y_p}),
+                vec({0, 600})) < 200)
         {
             continue;
         }
         if (distance_from_line_segment(
-                vec2(x, y),
-                vec2(x_p, y_p),
-                vec2(600, 0)) < 200)
+                vec({x, y}),
+                vec({x_p, y_p}),
+                vec({600, 0})) < 200)
         {
             continue;
         }
         if (distance_from_line_segment(
-                vec2(x, y),
-                vec2(x_p, y_p),
-                vec2(0, -600)) < 200)
+                vec({x, y}),
+                vec({x_p, y_p}),
+                vec({0, -600})) < 200)
         {
             continue;
         }
         if (distance_from_line_segment(
-                vec2(x, y),
-                vec2(x_p, y_p),
-                vec2(-600, 0)) < 200)
+                vec({x, y}),
+                vec({x_p, y_p}),
+                vec({-600, 0})) < 200)
         {
             continue;
         }
@@ -134,7 +134,7 @@ void vantadrive::stopDrive()
 
 double vantadrive::distanceTo(double targetX, double targetY)
 {
-    return distance_between(vec2(GPS.xPosition(), GPS.yPosition()), vec2(targetX, targetY));
+    return vec::dist_between(vec({GPS.xPosition(), GPS.yPosition()}), vec({targetX, targetY}));
 }
 
 double vantadrive::bearingTo(double targetX, double targetY)

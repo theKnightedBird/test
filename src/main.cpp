@@ -86,7 +86,7 @@ optical intake_sensor = optical(PORT16);
 intaker intake = intaker(intake_group, intake_sensor);
 
 digital_out clamper = digital_out(Brain.ThreeWirePort.A);
-distance clamper_sens = distance(PORT5);
+vex::distance clamper_sens = vex::distance(PORT5);
 
 vantabot bot = vantabot(drive, intake, clamper, clamper_sens);
 #endif

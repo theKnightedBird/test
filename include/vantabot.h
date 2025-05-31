@@ -10,11 +10,11 @@ class vantabot
     vantadrive &drive;
     intaker &intake;
     digital_out &clamper;
-    distance &clamp_sensor;
+    vex::distance &clamp_sensor;
     bool holdingGoal = false;
 
 public:
-    vantabot(vantadrive &d, intaker &i, digital_out &c, distance &cs);
+    vantabot(vantadrive &d, intaker &i, digital_out &c, vex::distance &cs);
 
     bool hasGoal();
     void grabGoal();
