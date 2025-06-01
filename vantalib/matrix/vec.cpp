@@ -17,6 +17,7 @@ double vec::size() const { return array.size(); }
 
 vec vec::operator+(double scalar) const
 {
+
     vec out(size());
     for (int i = 0; i < size(); i++)
     {
@@ -26,6 +27,8 @@ vec vec::operator+(double scalar) const
 }
 vec vec::operator+(const vec &v2) const
 {
+    if (size() != v2.size())
+        __throw_invalid_argument("Vector sizes must match");
     vec out(size());
     for (int i = 0; i < size(); i++)
     {
@@ -44,6 +47,8 @@ vec vec::operator-(double scalar) const
 }
 vec vec::operator-(const vec &v2) const
 {
+    if (size() != v2.size())
+        __throw_invalid_argument("Vector sizes must match");
     vec out(size());
     for (int i = 0; i < size(); i++)
     {
@@ -72,6 +77,8 @@ vec operator*(double scalar, const vec &v)
 }
 vec vec::operator/(double scalar) const
 {
+    if (scalar == 0.0)
+        __throw_domain_error("Division by zero");
     vec out(size());
     for (int i = 0; i < size(); i++)
     {
@@ -82,6 +89,8 @@ vec vec::operator/(double scalar) const
 
 double vec::operator*(const vec &v2) const
 {
+    if (size() != v2.size())
+        __throw_invalid_argument("Vector sizes must match");
     double out = 0;
     for (int i = 0; i < size(); i++)
     {
@@ -107,7 +116,7 @@ mat vec::to_col_matrix() const
     {
         out[i][0] = array[i];
     }
-    return mat();
+    return out;
 }
 
 mat vec::to_row_matrix() const
@@ -117,7 +126,7 @@ mat vec::to_row_matrix() const
     {
         out[0][i] = array[i];
     }
-    return mat();
+    return out;
 }
 
 mat vec::to_diagonal_matrix() const
@@ -127,7 +136,7 @@ mat vec::to_diagonal_matrix() const
     {
         out[i][i] = array[i];
     }
-    return mat();
+    return out;
 }
 
 double vec::mag_squared() const
@@ -135,7 +144,7 @@ double vec::mag_squared() const
     double out = 0;
     for (double i : array)
     {
-        out += pow(i, 2);
+        out += i * i;
     }
     return out;
 }
@@ -152,12 +161,14 @@ vec vec::normalized() const
 
 vec vec::proj(const vec &projecting, const vec &onto)
 {
-    return (projecting * onto / onto.mag()) * onto;
+    return (projecting * onto / onto.mag_squared()) * onto;
 }
 
 double vec::dist_between(const vec &v1, const vec &v2)
 {
-    double out;
+    if (v1.size() != v2.size())
+        __throw_invalid_argument("Vector sizes must match");
+    double out = 0.0;
     for (int i = 0; i < v1.size(); i++)
     {
         out += pow(v1[i] - v2[i], 2);

@@ -17,9 +17,9 @@ public:
     vantabot(vantadrive &d, intaker &i, digital_out &c, vex::distance &cs);
 
     bool hasGoal();
-    void grabGoal();
-    void findAndScoreRing(OBJECT ring_type);
-    void scoreInPositiveCorner();
+    void grab_goal();
+    void find_and_score_ring(OBJECT ring_type);
+    void score_in_positive_corner();
     void tipOverGoal();
     void go_to_sector();
 };

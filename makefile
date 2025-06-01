@@ -31,6 +31,7 @@ SRC_A  = makefile
 INC_F  = include
 INC_F += vantalib
 INC_F += vantalib/matrix
+INC_F += vantalib/subsystem
 
 
 # build targets

@@ -63,7 +63,7 @@ DETECTION_OBJECT vantadrive::find_optimal_target(int type)
         if (distanceTo(x_p, y_p) > 5000)
             continue;
         // don't pick up anything outside the borders
-        if (fabs(x_p) > 1800 || fabs(y_p) > 1800)
+        if (fabs(x_p) > 1600 || fabs(y_p) > 1600)
             continue;
         // penalize game pieces close to the border
         if (fabs(x_p) > 1600 || fabs(y_p) > 1600)
@@ -154,7 +154,8 @@ void vantadrive::turnTo(double targetAngle, bool reverse)
     turnController.reset();
     double prev_angle = imu.heading();
     double turn_speed;
-    while (fabs(angle_between(targetHeading, imu.heading())) > 2.0 || fabs(imu.heading() - prev_angle) > 0.5)
+    double start_time = timer::system();
+    while ((fabs(angle_between(targetHeading, imu.heading())) > 2.0 || fabs(imu.heading() - prev_angle) > 0.5) && (timer::system() - start_time) < 5000)
     {
         turn_speed = turnController.calculate(angle_between(targetHeading, imu.heading()));
         setSpeeds(0.0, turn_speed);
@@ -191,12 +192,13 @@ void vantadrive::driveTo(double targetX, double targetY, bool reverse, double to
 {
     double drive_speed;
     double turn_speed;
+    double start_time = timer::system();
 
     // first pass
     turnTo(targetX, targetY, reverse);
     driveController.reset();
     holdController.reset();
-    while (distanceTo(targetX, targetY) > 5 * tolerance)
+    while ((distanceTo(targetX, targetY) > 5 * tolerance) && (timer::system() - start_time) < 5000)
     {
         drive_speed = driveController.calculate(distanceTo(targetX, targetY));
         if (reverse)
@@ -218,7 +220,7 @@ void vantadrive::driveTo(double targetX, double targetY, bool reverse, double to
         turnTo(targetX, targetY, reverse);
         driveController.reset();
         holdController.reset();
-        while (distanceTo(targetX, targetY) > tolerance)
+        while ((distanceTo(targetX, targetY) > tolerance) && (timer::system() - start_time) < 5000)
         {
             drive_speed = driveController.calculate(distanceTo(targetX, targetY));
             if (reverse)

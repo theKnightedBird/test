@@ -10,7 +10,6 @@ class vantadrive
     motor_group &left;
     motor_group &right;
 
-    inertial &imu;
     thread periodicThread;
     AI_RECORD local_map;
     double targetHeading = 0.0;
@@ -20,6 +19,7 @@ class vantadrive
 
 public:
     gps &GPS;
+    inertial &imu;
     vantadrive(vex::motor_group &l, vex::motor_group &r, vex::gps &gps, vex::inertial &imu);
 
     void periodic();

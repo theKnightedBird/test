@@ -13,7 +13,7 @@ bool vantabot::hasGoal()
     return clamp_sensor.objectDistance(mm) < 100;
 }
 
-void vantabot::grabGoal()
+void vantabot::grab_goal()
 {
     go_to_sector();
     clamper.set(false);
@@ -31,7 +31,7 @@ void vantabot::grabGoal()
     }
 }
 
-void vantabot::findAndScoreRing(OBJECT ring_type)
+void vantabot::find_and_score_ring(OBJECT ring_type)
 {
     go_to_sector();
     intake.intake();
@@ -42,7 +42,7 @@ void vantabot::findAndScoreRing(OBJECT ring_type)
     intake.stop();
 }
 
-void vantabot::scoreInPositiveCorner()
+void vantabot::score_in_positive_corner()
 {
     vec dest = vec({(allianceRing == RedRing) ? 1300.0 : -1300.0,
                     -1300.0});
@@ -72,10 +72,10 @@ void vantabot::go_to_sector()
 {
     vec position = vec({drive.GPS.xPosition(), drive.GPS.yPosition()});
     vec sectors[] = {
-        vec({800.0, 800.0}),
-        vec({800, -800}),
-        vec({-800, 800}),
-        vec({-800, -800})};
+        vec({900.0, 900.0}),
+        vec({900, -900}),
+        vec({-900, 900}),
+        vec({-900, -900})};
     vec closest;
     double closestDist = 1000000000;
     for (vec sector : sectors)
@@ -83,7 +83,7 @@ void vantabot::go_to_sector()
         if (vec::dist_between(position, sector) < closestDist)
         {
             closestDist = vec::dist_between(position, sector);
-            closest = sector;
+            closest = vec(sector);
         }
     }
     drive.driveTo(closest[0], closest[1], false, 200.0);

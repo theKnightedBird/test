@@ -179,7 +179,7 @@ mat mat::transpose() const
 mat mat::minor(int row_removed, int col_removed) const
 {
     mat out(rows() - 1, cols() - 1);
-    int minor_row, minor_column = 0;
+    int minor_row = 0, minor_column = 0;
     for (int i = 0; i < rows(); i++)
     {
         if (i == row_removed)

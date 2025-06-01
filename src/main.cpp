@@ -33,7 +33,7 @@ ai::jetson jetson_comms;
 // The Demo is symetrical, we send the same data and display the same status on both
 // manager and worker robots
 // Comment out the following definition to build for the worker robot
-// #define MANAGER_ROBOT 1
+#define MANAGER_ROBOT 1
 // Change to redRing if we're red, and blueRing if we're blue
 OBJECT allianceRing = RedRing;
 
@@ -59,7 +59,7 @@ optical intake_sensor = optical(PORT16);
 intaker intake = intaker(intake_group, intake_sensor);
 
 digital_out clamper = digital_out(Brain.ThreeWirePort.B);
-distance clamperSensor = distance(PORT13);
+vex::distance clamperSensor = vex::distance(PORT13);
 
 vantabot bot = vantabot(drive, intake, clamper, clamperSensor);
 
@@ -118,41 +118,28 @@ void auto_Isolation(void)
 
 void auto_Interaction(void)
 {
-  drive.calibrate();
-  bot.grabGoal();
-  wait(1, sec);
-  bot.findAndScoreRing(allianceRing);
-  wait(1, sec);
-  bot.findAndScoreRing(allianceRing);
-  wait(1, sec);
-  bot.findAndScoreRing(allianceRing);
-  wait(1, sec);
-  bot.scoreInPositiveCorner();
-
-  // drive.driveTo(1200.0, 1200.0, true);
-  // drive.driveTo(-1200.0, 1200.0, true);
-  // drive.driveTo(-1200.0, -1200.0, true);
-  // drive.driveTo(1200.0, -1200.0);
-
-  // drive.drive(50.0, 1000.0);
-  // wait(1, sec);
-  // drive.drive(50.0, 1000.0, true);
-
-  //     while (true)
-  //     {
-  //       if (!bot.hasGoal())
-  //       {
-  //         bot.grabGoal();
-  //       }
-  //       else if (intake.getNumRingsInGoal() < 6)
-  //       {
-  //         bot.findAndScoreRing();
-  //       }
-  //       else
-  //       {
-  //         bot.scoreInPositiveCorner();
-  //       }
-  //     }
+  double rings_in_goal = 0;
+  bool goal_in_corner = false;
+  while (true)
+  {
+    if (!bot.hasGoal())
+    {
+      bot.grab_goal();
+    }
+    else if (rings_in_goal > 5 && goal_in_corner)
+    {
+      bot.go_to_sector();
+      bot.tipOverGoal();
+    }
+    else if (rings_in_goal > 5)
+    {
+      bot.score_in_positive_corner();
+    }
+    else
+    {
+      bot.find_and_score_ring(allianceRing);
+    }
+  }
 }
 
 /*---------------------------------------------------------------------------*/
@@ -175,7 +162,7 @@ void autonomousMain(void)
   // and we will enter the interaction period.
   // ..........................................................................
 
-  // drive.calibrate();
+  drive.calibrate();
 
   auto_Interaction();
 }
@@ -183,6 +170,10 @@ void autonomousMain(void)
 int main()
 {
 
+  ostringstream oss;
+  oss << vec::dist_between(vec({500, 500}), vec({800, 300}));
+
+  printf("%s\n", oss.str().c_str());
   // local storage for latest data from the Jetson Nano
   static AI_RECORD local_map;
 

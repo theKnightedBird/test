@@ -2,7 +2,8 @@
 
 intaker::intaker(motor_group &m, optical &o) : intake_motor(m),
                                                intake_sensor(o),
-                                               periodicThread(_startPeriodic, this)
+                                               periodicThread(_startPeriodic, this),
+                                               runIntake(false)
 {
 }
 
