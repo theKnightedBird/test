@@ -69,19 +69,19 @@ DETECTION_OBJECT vantadrive::find_optimal_target(int type)
         if (fabs(x_p) > 1600 || fabs(y_p) > 1600)
             score *= 2;
         // disallow the path from crossign the center poles
-        if (distance_from_line_segment(vec({x, y}), vec({x_p, y_p}), vec({0, 600})) < 200)
+        if (distance_from_line_segment(vec({x, y}), vec({x_p, y_p}), vec({0, 600})) < 100)
         {
             continue;
         }
-        if (distance_from_line_segment(vec({x, y}), vec({x_p, y_p}), vec({600, 0})) < 200)
+        if (distance_from_line_segment(vec({x, y}), vec({x_p, y_p}), vec({600, 0})) < 100)
         {
             continue;
         }
-        if (distance_from_line_segment(vec({x, y}), vec({x_p, y_p}), vec({0, -600})) < 200)
+        if (distance_from_line_segment(vec({x, y}), vec({x_p, y_p}), vec({0, -600})) < 100)
         {
             continue;
         }
-        if (distance_from_line_segment(vec({x, y}), vec({x_p, y_p}), vec({-600, 0})) < 200)
+        if (distance_from_line_segment(vec({x, y}), vec({x_p, y_p}), vec({-600, 0})) < 100)
         {
             continue;
         }
@@ -143,7 +143,7 @@ void vantadrive::turnTo(double targetAngle, bool reverse)
     double prev_angle = imu.heading();
     double turn_speed;
     double start_time = timer::system();
-    while ((fabs(angle_between(targetHeading, imu.heading())) > 2.0 || fabs(imu.heading() - prev_angle) > 0.5) && (timer::system() - start_time) < 5000)
+    while ((fabs(angle_between(targetHeading, imu.heading())) > 2.0 || fabs(imu.heading() - prev_angle) > 0.5) && (timer::system() - start_time) < 3000)
     {
         turn_speed = turnController.calculate(angle_between(targetHeading, imu.heading()));
         setSpeeds(0.0, turn_speed);
@@ -208,7 +208,7 @@ void vantadrive::driveTo(double targetX, double targetY, bool reverse, double to
         turnTo(targetX, targetY, reverse);
         driveController.reset();
         holdController.reset();
-        while ((distanceTo(targetX, targetY) > tolerance) && (timer::system() - start_time) < 5000)
+        while ((distanceTo(targetX, targetY) > tolerance) && (timer::system() - start_time) < 10000)
         {
             drive_speed = driveController.calculate(distanceTo(targetX, targetY));
             if (reverse)

@@ -60,6 +60,8 @@ intaker intake = intaker(intake_group, intake_sensor);
 
 digital_out clamper = digital_out(Brain.ThreeWirePort.B);
 vex::distance clamperSensor = vex::distance(PORT13);
+digital_out doinker = digital_out(Brain.ThreeWirePort.E);
+digital_out intakeLift = digital_out(Brain.ThreeWirePort.H);
 
 vantabot bot = vantabot(drive, intake, clamper, clamperSensor);
 
@@ -86,7 +88,8 @@ optical intake_sensor = optical(PORT16);
 intaker intake = intaker(intake_group, intake_sensor);
 
 digital_out clamper = digital_out(Brain.ThreeWirePort.A);
-vex::distance clamper_sens = vex::distance(PORT5);
+digital_out intakeLift = digital_out(Brain.ThreeWirePort.B)
+    vex::distance clamper_sens = vex::distance(PORT5);
 
 vantabot bot = vantabot(drive, intake, clamper, clamper_sens);
 #endif
@@ -103,7 +106,37 @@ vantabot bot = vantabot(drive, intake, clamper, clamper_sens);
 
 void auto_Isolation(void)
 {
-  // drive.turnTo(0, 0);
+  intake.intake();
+#if defined(MANAGER_ROBOT)
+  doinker.set(true);
+  drive.driveTo(20, 220, false, 50, false);
+  drive.driveTo(1000, 1000, true, 50, false);
+  doinker.set(false);
+  drive.driveTo(800, 500, true, 50, false);
+  clamper.set(true);
+  intake.intake();
+  intakeLift.set(true);
+  drive.driveTo(600, 1400, false, 50, true);
+  intakeLift.set(false);
+  vexDelay(200);
+  drive.driveTo(1400, 1200, false, 50, true);
+#else
+  drive.driveTo(1150, 100, true);
+  vexDelay(100);
+  clamper.set(true); // stake
+  intake.intake();
+  drive.driveTo(1500, 0); // ring 2
+  drive.driveTo(1400, 0, false, 30, false);
+  drive.driveTo(1500, 700, false, 50, false);
+  drive.driveTo(1250, -1300, false, 75, true); // ring 3
+  drive.driveTo(100, -1400, false, 50, false);
+  vexDelay(200);
+  // drive.driveTo(0,-1400,false,50,false);//ring 5
+  clamper.set(false);
+  intake_motor.spinFor(reverse, 100, msec);
+  drive.driveTo(1500, -1550, true, 90, true);
+  drive.driveTo(800, -1200, false, 50, false);
+#endif
 }
 
 /*---------------------------------------------------------------------------*/
@@ -151,7 +184,7 @@ void auto_Interaction(void)
 /*                                                                           */
 /*---------------------------------------------------------------------------*/
 
-bool firstAutoFlag = false;
+bool firstAutoFlag = true;
 
 void autonomousMain(void)
 {
@@ -164,7 +197,12 @@ void autonomousMain(void)
 
   drive.calibrate();
 
-  auto_Interaction();
+  if (firstAutoFlag)
+    auto_Isolation();
+  else
+    auto_Interaction();
+
+  firstAutoFlag = false;
 }
 
 int main()
