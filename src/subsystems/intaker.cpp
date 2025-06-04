@@ -38,15 +38,15 @@ void intaker::periodic()
             //     intake_motor.spin(forward, 50, pct);
             // }
 
-            // // reject rings
-            // if (allianceRing == RedRing && ((hue >= 340 && hue <= 359) || (hue <= 20 && hue >= 0)))
-            // {
-            //     intake_motor.spinFor(reverse, 500, msec);
-            // }
-            // if (allianceRing == BlueRing && hue >= 200 && hue <= 230)
-            // {
-            //     intake_motor.spinFor(reverse, 500, msec);
-            // }
+            // reject rings
+            if (allianceRing == RedRing && ((hue >= 340 && hue <= 359) || (hue <= 20 && hue >= 0)))
+            {
+                intake_motor.spinFor(reverse, 500, msec);
+            }
+            if (allianceRing == BlueRing && hue >= 200 && hue <= 230)
+            {
+                intake_motor.spinFor(reverse, 500, msec);
+            }
         }
         else
         {
