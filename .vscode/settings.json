@@ -5,5 +5,16 @@
 	"C_Cpp.errorSquiggles": "enabled",
 	"files.associations": {
 		"cmath": "cpp"
-	}
+	},
+	"cSpell.words": [
+		"intaker",
+		"jetson",
+		"mkenv",
+		"mkrules",
+		"vantabot",
+		"vantadrive",
+		"vantalib",
+		"VEXCODE",
+		"vexos"
+	]
 }

@@ -24,7 +24,7 @@ SRC_H  += $(wildcard include/*/*.h)
 SRC_H  += $(wildcard vantalib/*.h)
 SRC_H  += $(wildcard vantalib/*/*.h)
 
-# additional dependancies
+# additional dependencies
 SRC_A  = makefile
 
 # project header file locations

@@ -30,7 +30,7 @@ ai::jetson jetson_comms;
 // The unique name should probably incorporate the team number
 // and be at least 12 characters so as to generate a good hash
 //
-// The Demo is symetrical, we send the same data and display the same status on both
+// The Demo is symmetrical, we send the same data and display the same status on both
 // manager and worker robots
 // Comment out the following definition to build for the worker robot
 #define MANAGER_ROBOT 1
