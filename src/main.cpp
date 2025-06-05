@@ -33,7 +33,7 @@ ai::jetson jetson_comms;
 // The Demo is symmetrical, we send the same data and display the same status on both
 // manager and worker robots
 // Comment out the following definition to build for the worker robot
-#define MANAGER_ROBOT 1
+// #define MANAGER_ROBOT 1
 // Change to redRing if we're red, and blueRing if we're blue
 OBJECT allianceRing = RedRing;
 
@@ -85,12 +85,12 @@ vantadrive drive = vantadrive(leftDrive, rightDrive, GPS, imu);
 motor intake_motor_A = motor(PORT8, ratio18_1, true);
 motor intake_motor_B = motor(PORT9, ratio18_1, true);
 motor_group intake_group = motor_group(intake_motor_A, intake_motor_B);
-optical intake_sensor = optical(PORT16);
-intaker intake = intaker(intake_group, intake_sensor);
+optical intake_sensor = optical(PORT7);
+intaker intake = intaker(intake_group, intake_sensor, 980, 520, 500);
 
 digital_out clamper = digital_out(Brain.ThreeWirePort.A);
-digital_out intakeLift = digital_out(Brain.ThreeWirePort.B)
-    vex::distance clamper_sens = vex::distance(PORT5);
+digital_out intakeLift = digital_out(Brain.ThreeWirePort.B);
+vex::distance clamper_sens = vex::distance(PORT5);
 
 vantabot bot = vantabot(drive, intake, clamper, clamper_sens);
 #endif
@@ -134,7 +134,7 @@ void auto_Isolation(void)
   vexDelay(200);
   // drive.driveTo(0,-1400,false,50,false);//ring 5
   clamper.set(false);
-  intake_motor.spinFor(reverse, 100, msec);
+  // intake_motor.spinFor(reverse, 100, msec);
   drive.driveTo(1500, -1550, true, 90, true);
   drive.driveTo(800, -1200, false, 50, false);
 #endif

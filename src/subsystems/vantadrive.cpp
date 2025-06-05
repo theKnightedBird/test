@@ -69,7 +69,7 @@ DETECTION_OBJECT vantadrive::find_optimal_target(int type)
         // penalize game pieces close to the border
         if (fabs(x_p) > 1600 || fabs(y_p) > 1600)
             score *= 2;
-        // disallow the path from crossign the center poles
+        // disallow the path from crossing the center poles
         // if (distance_from_line_segment(vec({x, y}), vec({x_p, y_p}), vec({0, 600})) < 100)
         // {
         //     continue;

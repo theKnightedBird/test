@@ -10,10 +10,14 @@ intaker::intaker(motor_group &m, optical &o, int h, int sensor_d, int eject_d) :
 {
     intake_sensor.setLightPower(100, percent);
     intake_sensor.setLight(ledState::on);
+#if !defined(MANAGER_ROBOT)
+    intake_motor.setPosition(-360, degrees);
+#endif
 }
 
 void intaker::rejectRing()
 {
+#if defined(MANAGER_ROBOT)
     double pos = intake_motor.position(degrees);
     nextPos = ((int)((pos + sensor_dist / hook) * hook + eject_dist));
     while (pos < nextPos)
@@ -24,6 +28,19 @@ void intaker::rejectRing()
     intake_motor.spin(reverse);
     wait(100, msec);
     intake_motor.spin(forward);
+#else
+    double pos = intake_motor.position(degrees);
+    double nextPos = ((int)(pos / hook) + 1) * hook;
+
+    while (pos < nextPos)
+    {
+        pos = intake_motor.position(degrees);
+        wait(5, msec);
+    }
+    intake_motor.stop();
+    wait(100, msec);
+    intake_motor.spin(forward);
+#endif
 }
 
 void intaker::periodic()
