@@ -46,6 +46,7 @@ DETECTION_OBJECT vantadrive::find_optimal_target(int type)
     jetson_comms.get_data(&local_map);
     double lowest_score = 20000;
     double score;
+    vector<vec> ring_locations;
     // Iterate through detected objects to find the best target of the specified type
     for (DETECTION_OBJECT game_piece : local_map.detections)
     {
@@ -60,41 +61,56 @@ DETECTION_OBJECT vantadrive::find_optimal_target(int type)
         if (game_piece.classID != type)
             continue;
         // don't pick up anything too far away, just turn and look for a better one instead.
-        if (distanceTo(x_p, y_p) > 5000)
+        if (game_piece.probability < 0.3)
             continue;
         // don't pick up anything outside the borders
-        if (fabs(x_p) > 1600 || fabs(y_p) > 1600)
+        if (fabs(x_p) > 1800 || fabs(y_p) > 1800)
             continue;
         // penalize game pieces close to the border
         if (fabs(x_p) > 1600 || fabs(y_p) > 1600)
             score *= 2;
         // disallow the path from crossign the center poles
-        if (distance_from_line_segment(vec({x, y}), vec({x_p, y_p}), vec({0, 600})) < 100)
+        // if (distance_from_line_segment(vec({x, y}), vec({x_p, y_p}), vec({0, 600})) < 100)
+        // {
+        //     continue;
+        // }
+        // if (distance_from_line_segment(vec({x, y}), vec({x_p, y_p}), vec({600, 0})) < 100)
+        // {
+        //     continue;
+        // }
+        // if (distance_from_line_segment(vec({x, y}), vec({x_p, y_p}), vec({0, -600})) < 100)
+        // {
+        //     continue;
+        // }
+        // if (distance_from_line_segment(vec({x, y}), vec({x_p, y_p}), vec({-600, 0})) < 100)
+        // {
+        //     continue;
+        // }
+        // don't go for rings in the middle
+        if (fabs(x_p) < 600 && fabs(y_p) < 600 && (game_piece.classID == RedRing || game_piece.classID == BlueRing))
         {
             continue;
         }
-        if (distance_from_line_segment(vec({x, y}), vec({x_p, y_p}), vec({600, 0})) < 100)
+        // don't go for goals with pieces on them
+        if (game_piece.classID == MobileGoal)
         {
-            continue;
-        }
-        if (distance_from_line_segment(vec({x, y}), vec({x_p, y_p}), vec({0, -600})) < 100)
-        {
-            continue;
-        }
-        if (distance_from_line_segment(vec({x, y}), vec({x_p, y_p}), vec({-600, 0})) < 100)
-        {
-            continue;
-        }
-        // don't go for things in the middle
-        if (fabs(x_p) < 600 && fabs(y_p) < 600)
-        {
-            continue;
+            for (vec v : ring_locations)
+            {
+                if (vec::dist_between(v, vec({x_p, y_p})) < 30)
+                {
+                    score += 100000000000000000000000000.0;
+                }
+            }
         }
 
         if (score < lowest_score)
         {
             lowest_score = score;
             target = game_piece;
+        }
+        if (game_piece.classID == RedRing || game_piece.classID == BlueRing)
+        {
+            ring_locations.push_back(vec({x_p, y_p}));
         }
     }
     return target;
@@ -208,7 +224,7 @@ void vantadrive::driveTo(double targetX, double targetY, bool reverse, double to
         turnTo(targetX, targetY, reverse);
         driveController.reset();
         holdController.reset();
-        while ((distanceTo(targetX, targetY) > tolerance) && (timer::system() - start_time) < 10000)
+        while ((distanceTo(targetX, targetY) > tolerance) && ((timer::system() - start_time) < 8000))
         {
             drive_speed = driveController.calculate(distanceTo(targetX, targetY));
             if (reverse)
@@ -232,11 +248,32 @@ void vantadrive::driveTo(OBJECT type, bool reverse, double tolerance, bool doSec
     stopDrive();
     wait(200, msec);
     DETECTION_OBJECT target = find_optimal_target(type);
+    int turns = 0;
     while (target.mapLocation.x == 0.0 && target.mapLocation.y == 0.0)
     {
         turnFor(60);
         wait(200, msec);
         target = find_optimal_target(type);
+        turns++;
+        if (turns % 8 == 7)
+        {
+            if (GPS.xPosition() >= 0 && GPS.yPosition() >= 0)
+            {
+                driveTo(900, -900);
+            }
+            else if (GPS.xPosition() >= 0 && GPS.yPosition() <= 0)
+            {
+                driveTo(-900, -900);
+            }
+            else if (GPS.xPosition() <= 0 && GPS.yPosition() <= 0)
+            {
+                driveTo(-900, 900);
+            }
+            else
+            {
+                driveTo(900, 900);
+            }
+        }
     }
     driveTo(target.mapLocation.x * 1000, target.mapLocation.y * 1000, reverse, tolerance, doSecondPass);
 }
@@ -249,7 +286,8 @@ void vantadrive::drive(double power, double distance, bool reverse)
     double startY = GPS.yPosition();
     double drive_speed;
     double turn_speed;
-    while (distanceTo(startX, startY) < distance)
+    double start_time = timer::system();
+    while (distanceTo(startX, startY) < distance && (timer::system() - start_time < 4000))
     {
         drive_speed = reverse ? -power : power;
         turn_speed = holdController.calculate(angle_between(targetHeading, imu.heading()));

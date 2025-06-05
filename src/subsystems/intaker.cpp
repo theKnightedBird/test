@@ -1,10 +1,29 @@
 #include "intaker.h"
 
-intaker::intaker(motor_group &m, optical &o) : intake_motor(m),
-                                               intake_sensor(o),
-                                               periodicThread(_startPeriodic, this),
-                                               runIntake(false)
+intaker::intaker(motor_group &m, optical &o, int h, int sensor_d, int eject_d) : intake_motor(m),
+                                                                                 intake_sensor(o),
+                                                                                 periodicThread(_startPeriodic, this),
+                                                                                 runIntake(false),
+                                                                                 hook(h),
+                                                                                 sensor_dist(sensor_d),
+                                                                                 eject_dist(eject_d)
 {
+    intake_sensor.setLightPower(100, percent);
+    intake_sensor.setLight(ledState::on);
+}
+
+void intaker::rejectRing()
+{
+    double pos = intake_motor.position(degrees);
+    nextPos = ((int)((pos + sensor_dist / hook) * hook + eject_dist));
+    while (pos < nextPos)
+    {
+        pos = intake_motor.position(degrees);
+        wait(10, msec);
+    }
+    intake_motor.spin(reverse);
+    wait(100, msec);
+    intake_motor.spin(forward);
 }
 
 void intaker::periodic()
@@ -13,24 +32,9 @@ void intaker::periodic()
     while (true)
     {
         hue = intake_sensor.hue();
-
-        // // ring owning logic
-        // if (allianceRing == RedRing && hue >= 200 && hue <= 230)
-        //     hasRing = true;
-        // else if (allianceRing == BlueRing && ((hue >= 340 && hue <= 359) || (hue <= 20 && hue >= 0)))
-        //     hasRing = true;
-        // else
-        // {
-        //     if (hasRing == true)
-        //         numRingsInGoal++;
-        //     hasRing = false;
-        // }
-
-        // logic for intaking
         if (runIntake)
         {
             intake_motor.spin(fwd, 90, pct);
-            wait(250, msec);
             // // deal with jams
             // if (intake_motor.velocity(pct) < 5)
             // {
@@ -39,13 +43,13 @@ void intaker::periodic()
             // }
 
             // reject rings
-            if (allianceRing == RedRing && ((hue >= 340 && hue <= 359) || (hue <= 20 && hue >= 0)))
+            if (allianceRing == BlueRing && ((hue >= 340 && hue <= 359) || (hue <= 20 && hue >= 0)))
             {
-                intake_motor.spinFor(reverse, 500, msec);
+                rejectRing();
             }
-            if (allianceRing == BlueRing && hue >= 200 && hue <= 230)
+            if (allianceRing == RedRing && hue >= 190 && hue <= 230)
             {
-                intake_motor.spinFor(reverse, 500, msec);
+                rejectRing();
             }
         }
         else

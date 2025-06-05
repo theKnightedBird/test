@@ -56,7 +56,8 @@ vantadrive drive = vantadrive(leftDrive, rightDrive, GPS, imu);
 motor intake_motor = motor(PORT19, ratio18_1, false);
 motor_group intake_group = motor_group(intake_motor);
 optical intake_sensor = optical(PORT16);
-intaker intake = intaker(intake_group, intake_sensor);
+intaker intake = intaker(intake_group, intake_sensor, 980, 520, 500);
+motor claw = motor(PORT7, ratio18_1, true);
 
 digital_out clamper = digital_out(Brain.ThreeWirePort.B);
 vex::distance clamperSensor = vex::distance(PORT13);
@@ -151,10 +152,19 @@ void auto_Isolation(void)
 
 void auto_Interaction(void)
 {
+  double start_time = timer::system();
   double rings_in_goal = 0;
   bool goal_in_corner = false;
   while (true)
   {
+    if (timer::system() - start_time > 115 * 1000)
+    {
+#if defined(MANAGER_ROBOT)
+      bot.go_to_sector();
+      claw.spinFor(1, sec);
+      drive.driveTo(0.0, 0.0, true);
+#endif
+    }
     if (!bot.hasGoal())
     {
       bot.grab_goal();
@@ -184,7 +194,7 @@ void auto_Interaction(void)
 /*                                                                           */
 /*---------------------------------------------------------------------------*/
 
-bool firstAutoFlag = true;
+bool firstAutoFlag = false;
 
 void autonomousMain(void)
 {

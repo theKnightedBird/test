@@ -10,7 +10,7 @@ vantabot::vantabot(
 
 bool vantabot::hasGoal()
 {
-    return clamp_sensor.objectDistance(mm) < 100;
+    return clamp_sensor.isObjectDetected();
 }
 
 void vantabot::grab_goal()
