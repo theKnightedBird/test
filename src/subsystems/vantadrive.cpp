@@ -37,7 +37,7 @@ void vantadrive::calibrate()
     imu.setHeading(GPS.heading(), deg);
     imu.setRotation(GPS.rotation(), deg);
     targetHeading = imu.heading();
-    waitUntil(jetson_comms.get_packets() > 0);
+    // waitUntil(jetson_comms.get_packets() > 0);
 };
 
 DETECTION_OBJECT vantadrive::find_optimal_target(int type)

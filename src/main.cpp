@@ -194,7 +194,7 @@ void auto_Interaction(void)
 /*                                                                           */
 /*---------------------------------------------------------------------------*/
 
-bool firstAutoFlag = false;
+bool firstAutoFlag = true;
 
 void autonomousMain(void)
 {
@@ -208,9 +208,14 @@ void autonomousMain(void)
   drive.calibrate();
 
   if (firstAutoFlag)
+  {
     auto_Isolation();
+  }
   else
+  {
+    waitUntil(jetson_comms.get_packets() > 0);
     auto_Interaction();
+  }
 
   firstAutoFlag = false;
 }
