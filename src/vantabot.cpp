@@ -16,19 +16,12 @@ bool vantabot::hasGoal()
 void vantabot::grab_goal()
 {
     go_to_sector();
-    clamper.set(false);
     drive.driveTo(MobileGoal, true, 50.0, false);
+    clamper.set(false);
     drive.drive(33, 300, true);
+    wait(200, msec);
     clamper.set(true);
-    go_to_sector();
-    while (!clamp_sensor.isObjectDetected())
-    {
-        clamper.set(false);
-        drive.driveTo(MobileGoal, true, 50.0, false);
-        drive.drive(33, 300, true);
-        clamper.set(true);
-        go_to_sector();
-    }
+    wait(200, msec);
 }
 
 void vantabot::find_and_score_ring(OBJECT ring_type)
@@ -53,7 +46,7 @@ void vantabot::score_in_positive_corner()
     go_to_sector();
 
     drive.driveTo(dest[0], dest[1], true);
-    drive.turnTo(dest2[0], dest2[0], true);
+    drive.turnTo(dest2[0], dest2[1], true);
     clamper.set(false);
     drive.drive(50, 150, true);
     drive.drive(50, 150);
@@ -72,10 +65,10 @@ void vantabot::go_to_sector()
 {
     vec position = vec({drive.GPS.xPosition(), drive.GPS.yPosition()});
     vec sectors[] = {
-        vec({900.0, 900.0}),
-        vec({900, -900}),
-        vec({-900, 900}),
-        vec({-900, -900})};
+        vec({800.0, 800.0}),
+        vec({800.0, -800.0}),
+        vec({-800.0, 800.0}),
+        vec({-800.0, -800.0})};
     vec closest;
     double closestDist = 1000000000;
     for (vec sector : sectors)
@@ -86,5 +79,5 @@ void vantabot::go_to_sector()
             closest = vec(sector);
         }
     }
-    drive.driveTo(closest[0], closest[1], false, 200.0);
+    drive.driveTo(closest[0], closest[1], false);
 }

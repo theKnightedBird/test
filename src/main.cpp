@@ -1,12 +1,3 @@
-/*----------------------------------------------------------------------------*/
-/*                                                                            */
-/*    Module:       main.cpp                                                  */
-/*    Author:       james                                                     */
-/*    Created:      Mon Aug 31 2020                                           */
-/*    Description:  V5 project                                                */
-/*                                                                            */
-/*----------------------------------------------------------------------------*/
-
 // ---- START VEXCODE CONFIGURED DEVICES ----
 // ---- END VEXCODE CONFIGURED DEVICES ----
 #include "robot-config.h"
@@ -33,13 +24,13 @@ ai::jetson jetson_comms;
 // The Demo is symmetrical, we send the same data and display the same status on both
 // manager and worker robots
 // Comment out the following definition to build for the worker robot
-// #define MANAGER_ROBOT 1
+#define MANAGER_ROBOT 1
 // Change to redRing if we're red, and blueRing if we're blue
 OBJECT allianceRing = RedRing;
 
 #if defined(MANAGER_ROBOT)
 #pragma message("building for the manager")
-ai::robot_link link(PORT15, "robot_32456_1", linkType::manager);
+ai::robot_link link(PORT15, "robot_6599A_1", linkType::manager);
 
 motor leftMotorA = motor(PORT4, ratio6_1, true);
 motor leftMotorB = motor(PORT3, ratio6_1, true);
@@ -53,7 +44,7 @@ gps GPS = gps(PORT17, 100, 0, distanceUnits::mm, 90);
 inertial imu = inertial(PORT6);
 vantadrive drive = vantadrive(leftDrive, rightDrive, GPS, imu);
 
-motor intake_motor = motor(PORT19, ratio18_1, false);
+motor intake_motor = motor(PORT19, ratio18_1, true);
 motor_group intake_group = motor_group(intake_motor);
 optical intake_sensor = optical(PORT16);
 intaker intake = intaker(intake_group, intake_sensor, 980, 520, 500);
@@ -61,14 +52,15 @@ motor claw = motor(PORT7, ratio18_1, true);
 
 digital_out clamper = digital_out(Brain.ThreeWirePort.B);
 vex::distance clamperSensor = vex::distance(PORT13);
-digital_out doinker = digital_out(Brain.ThreeWirePort.E);
-digital_out intakeLift = digital_out(Brain.ThreeWirePort.H);
+digital_out left_doinker = digital_out(Brain.ThreeWirePort.E);
+digital_out right_doinker = digital_out(Brain.ThreeWirePort.C);
+digital_out intake_lift = digital_out(Brain.ThreeWirePort.H);
 
 vantabot bot = vantabot(drive, intake, clamper, clamperSensor);
 
 #else
 #pragma message("building for the worker")
-ai::robot_link link(PORT20, "robot_32456_1", linkType::worker);
+ai::robot_link link(PORT6, "robot_6599A_1", linkType::worker);
 
 motor leftMotorA = motor(PORT1, ratio6_1, true);
 motor leftMotorB = motor(PORT2, ratio6_1, true);
@@ -89,7 +81,7 @@ optical intake_sensor = optical(PORT7);
 intaker intake = intaker(intake_group, intake_sensor, 980, 520, 500);
 
 digital_out clamper = digital_out(Brain.ThreeWirePort.A);
-digital_out intakeLift = digital_out(Brain.ThreeWirePort.B);
+digital_out intake_lift = digital_out(Brain.ThreeWirePort.B);
 vex::distance clamper_sens = vex::distance(PORT5);
 
 vantabot bot = vantabot(drive, intake, clamper, clamper_sens);
@@ -107,36 +99,78 @@ vantabot bot = vantabot(drive, intake, clamper, clamper_sens);
 
 void auto_Isolation(void)
 {
-  intake.intake();
 #if defined(MANAGER_ROBOT)
-  doinker.set(true);
-  drive.driveTo(20, 220, false, 50, false);
-  drive.driveTo(1000, 1000, true, 50, false);
-  doinker.set(false);
-  drive.driveTo(800, 500, true, 50, false);
-  clamper.set(true);
-  intake.intake();
-  intakeLift.set(true);
-  drive.driveTo(600, 1400, false, 50, true);
-  intakeLift.set(false);
-  vexDelay(200);
-  drive.driveTo(1400, 1200, false, 50, true);
+  if (allianceRing == RedRing)
+  {
+    right_doinker.set(true);
+    drive.driveTo(-20, 220, false, 50, false);
+    drive.driveTo(-1000, 1000, true, 50, false);
+    right_doinker.set(false);
+    drive.driveTo(-800, 500, true, 50, false);
+    clamper.set(true);
+    intake.intake();
+    intake_lift.set(true);
+    drive.driveTo(-600, 1400, false, 50, true);
+    intake_lift.set(false);
+    vexDelay(200);
+    drive.driveTo(-1400, 1200, false, 50, true);
+  }
+  else
+  {
+    left_doinker.set(true);
+    drive.driveTo(20, 220, false, 50, false);
+    drive.driveTo(1000, 1000, true, 50, false);
+    left_doinker.set(false);
+    drive.driveTo(800, 500, true, 50, false);
+    clamper.set(true);
+    intake.intake();
+    intake_lift.set(true);
+    drive.driveTo(600, 1400, false, 50, true);
+    intake_lift.set(false);
+    vexDelay(200);
+    drive.driveTo(1400, 1200, false, 50, true);
+  }
+
 #else
-  drive.driveTo(1150, 100, true);
-  vexDelay(100);
-  clamper.set(true); // stake
-  intake.intake();
-  drive.driveTo(1500, 0); // ring 2
-  drive.driveTo(1400, 0, false, 30, false);
-  drive.driveTo(1500, 700, false, 50, false);
-  drive.driveTo(1250, -1300, false, 75, true); // ring 3
-  drive.driveTo(100, -1400, false, 50, false);
-  vexDelay(200);
-  // drive.driveTo(0,-1400,false,50,false);//ring 5
-  clamper.set(false);
-  // intake_motor.spinFor(reverse, 100, msec);
-  drive.driveTo(1500, -1550, true, 90, true);
-  drive.driveTo(800, -1200, false, 50, false);
+  if (allianceRing == RedRing)
+  {
+    drive.driveTo(-1150, 100, true, 50, false);
+    vexDelay(100);
+    clamper.set(true); // stake
+    intake.intake();
+    drive.driveTo(-1500, 0); // ring 2
+    drive.driveTo(-1400, 0, false, 30, false);
+    drive.driveTo(-1500, 700, false, 50, false);
+    drive.driveTo(-1250, -1300, false, 75, true); // ring 3
+    drive.driveTo(-100, -1400, false, 50, false);
+    vexDelay(200);
+    // drive.driveTo(0,-1400,false,50,false);//ring 5
+    clamper.set(false);
+    // intake_motor.spinFor(reverse, 100, msec);
+    intake.reverse();
+    drive.driveTo(-1500, -1550, true, 90, true);
+    drive.driveTo(-800, -1200, false, 50, false);
+  }
+  else
+  {
+    drive.driveTo(1150, 100, true, 50, false);
+    vexDelay(100);
+    clamper.set(true); // stake
+    intake.intake();
+    drive.driveTo(1500, 0); // ring 2
+    drive.driveTo(1400, 0, false, 30, false);
+    drive.driveTo(1500, 700, false, 50, false);
+    drive.driveTo(1250, -1300, false, 75, true); // ring 3
+    drive.driveTo(100, -1400, false, 50, false);
+    vexDelay(200);
+    // drive.driveTo(0,-1400,false,50,false);//ring 5
+    clamper.set(false);
+    // intake_motor.spinFor(reverse, 100, msec);
+    intake.reverse();
+    drive.driveTo(1500, -1550, true, 90, true);
+    drive.driveTo(800, -1200, false, 50, false);
+  }
+
 #endif
 }
 
@@ -153,36 +187,56 @@ void auto_Isolation(void)
 void auto_Interaction(void)
 {
   double start_time = timer::system();
-  double rings_in_goal = 0;
-  bool goal_in_corner = false;
+  int rings_in_goal = 0;
+  bool goal_in_corner = true;
+  intake.stop();
   while (true)
   {
-    if (timer::system() - start_time > 115 * 1000)
-    {
 #if defined(MANAGER_ROBOT)
-      bot.go_to_sector();
-      claw.spinFor(1, sec);
-      drive.driveTo(0.0, 0.0, true);
+    break;
 #endif
+    if (jetson_comms.get_packets() == 0)
+    {
+      wait(20, msec);
+      continue;
     }
     if (!bot.hasGoal())
     {
       bot.grab_goal();
     }
-    else if (rings_in_goal > 5 && goal_in_corner)
-    {
-      bot.go_to_sector();
-      bot.tipOverGoal();
-    }
-    else if (rings_in_goal > 5)
-    {
-      bot.score_in_positive_corner();
-    }
+    // else if ((rings_in_goal > 5) && goal_in_corner)
+    // {
+    //   bot.go_to_sector();
+    //   bot.tipOverGoal();
+    //   rings_in_goal = 0;
+    // }
+    // else if (rings_in_goal > 5)
+    // {
+    //   bot.score_in_positive_corner();
+    //   rings_in_goal = 0;
+    //   goal_in_corner = true;
+    // }
     else
     {
       bot.find_and_score_ring(allianceRing);
     }
   }
+  bot.go_to_sector();
+  drive.driveTo((allianceRing == RedRing) ? -1800.0 : 1800.0, -1800.0, true);
+  wait(200, msec);
+  clamper.set(true);
+  wait(200, msec);
+  bot.go_to_sector();
+  drive.driveTo((allianceRing == RedRing) ? -1800.0 : 1800.0, 1800.0, true);
+  clamper.set(false);
+  bot.go_to_sector();
+#if defined(MANAGER_ROBOT)
+  claw.setVelocity(100, pct);
+  claw.spinFor(directionType::fwd, 1, sec);
+  bot.go_to_sector();
+  drive.turnTo(0.0, 0.0, true);
+  drive.drive(70, 700, true);
+#endif
 }
 
 /*---------------------------------------------------------------------------*/
@@ -205,15 +259,13 @@ void autonomousMain(void)
   // and we will enter the interaction period.
   // ..........................................................................
 
-  drive.calibrate();
-
   if (firstAutoFlag)
   {
+    drive.calibrate();
     auto_Isolation();
   }
   else
   {
-    waitUntil(jetson_comms.get_packets() > 0);
     auto_Interaction();
   }
 

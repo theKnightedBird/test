@@ -13,9 +13,9 @@ class vantadrive
     thread periodicThread;
     AI_RECORD local_map;
     double targetHeading = 0.0;
-    pid_controller driveController = pid_controller(0.035, 0.0, 0.0);
+    pid_controller driveController = pid_controller(0.06, 0.0, 0.0);
     pid_controller turnController = pid_controller(0.4, 0.0, 0.0);
-    pid_controller holdController = pid_controller(0.3, 0.0, 0.0);
+    pid_controller holdController = pid_controller(0.4, 0.0, 0.0);
 
 public:
     gps &GPS;

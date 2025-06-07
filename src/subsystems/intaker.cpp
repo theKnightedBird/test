@@ -3,7 +3,7 @@
 intaker::intaker(motor_group &m, optical &o, int h, int sensor_d, int eject_d) : intake_motor(m),
                                                                                  intake_sensor(o),
                                                                                  periodicThread(_startPeriodic, this),
-                                                                                 runIntake(false),
+                                                                                 runIntake(STOP),
                                                                                  hook(h),
                                                                                  sensor_dist(sensor_d),
                                                                                  eject_dist(eject_d)
@@ -49,7 +49,7 @@ void intaker::periodic()
     while (true)
     {
         hue = intake_sensor.hue();
-        if (runIntake)
+        if (runIntake == RUN)
         {
             intake_motor.spin(fwd, 90, pct);
             // // deal with jams
@@ -68,6 +68,10 @@ void intaker::periodic()
             {
                 rejectRing();
             }
+        }
+        else if (runIntake == REVERSE)
+        {
+            intake_motor.spin(directionType::rev, 90, pct);
         }
         else
         {
@@ -99,10 +103,15 @@ void intaker::resetCount()
 
 void intaker::intake()
 {
-    runIntake = true;
+    runIntake = RUN;
 }
 
 void intaker::stop()
 {
-    runIntake = false;
+    runIntake = STOP;
+}
+
+void intaker::reverse()
+{
+    runIntake = REVERSE;
 }

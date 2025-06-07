@@ -46,15 +46,26 @@ DETECTION_OBJECT vantadrive::find_optimal_target(int type)
     jetson_comms.get_data(&local_map);
     double lowest_score = 20000;
     double score;
+    double x;
+    double y;
+    double x_p;
+    double y_p;
+    float x_r = 0;
+    float y_r = 0;
+    float h_r = 0;
     vector<vec> ring_locations;
     // Iterate through detected objects to find the best target of the specified type
     for (DETECTION_OBJECT game_piece : local_map.detections)
     {
-        double x = GPS.xPosition();
-        double y = GPS.yPosition();
-        double x_p = game_piece.mapLocation.x * 1000;
-        double y_p = game_piece.mapLocation.y * 1000;
-
+        x = GPS.xPosition();
+        y = GPS.yPosition();
+        x_p = game_piece.mapLocation.x * 1000;
+        y_p = game_piece.mapLocation.y * 1000;
+        link.get_remote_location(x_r, y_r, h_r);
+        if (game_piece.classID == RedRing || game_piece.classID == BlueRing)
+        {
+            ring_locations.push_back(vec({x_p, y_p}));
+        }
         // set score to the distance
         score = distanceTo(x_p, y_p);
         // don't pick up game pieces that aren't the game peice you want
@@ -68,26 +79,31 @@ DETECTION_OBJECT vantadrive::find_optimal_target(int type)
             continue;
         // penalize game pieces close to the border
         if (fabs(x_p) > 1600 || fabs(y_p) > 1600)
-            score *= 2;
+            score += 3000;
         // disallow the path from crossing the center poles
-        // if (distance_from_line_segment(vec({x, y}), vec({x_p, y_p}), vec({0, 600})) < 100)
-        // {
-        //     continue;
-        // }
-        // if (distance_from_line_segment(vec({x, y}), vec({x_p, y_p}), vec({600, 0})) < 100)
-        // {
-        //     continue;
-        // }
-        // if (distance_from_line_segment(vec({x, y}), vec({x_p, y_p}), vec({0, -600})) < 100)
-        // {
-        //     continue;
-        // }
-        // if (distance_from_line_segment(vec({x, y}), vec({x_p, y_p}), vec({-600, 0})) < 100)
-        // {
-        //     continue;
-        // }
+        if (distance_from_line_segment(vec({x, y}), vec({x_p, y_p}), vec({0, 600})) < 100)
+        {
+            continue;
+        }
+        if (distance_from_line_segment(vec({x, y}), vec({x_p, y_p}), vec({600, 0})) < 100)
+        {
+            continue;
+        }
+        if (distance_from_line_segment(vec({x, y}), vec({x_p, y_p}), vec({0, -600})) < 100)
+        {
+            continue;
+        }
+        if (distance_from_line_segment(vec({x, y}), vec({x_p, y_p}), vec({-600, 0})) < 100)
+        {
+            continue;
+        }
         // don't go for rings in the middle
         if (fabs(x_p) < 600 && fabs(y_p) < 600 && (game_piece.classID == RedRing || game_piece.classID == BlueRing))
+        {
+            continue;
+        }
+        // don't go for things that are close to our other robot
+        if (vec::dist_between(vec({x_p, y_p}), vec({x_r, y_r})) < 200.0)
         {
             continue;
         }
@@ -98,7 +114,7 @@ DETECTION_OBJECT vantadrive::find_optimal_target(int type)
             {
                 if (vec::dist_between(v, vec({x_p, y_p})) < 30)
                 {
-                    score += 100000000000000000000000000.0;
+                    score += 1000.0;
                 }
             }
         }
@@ -107,10 +123,6 @@ DETECTION_OBJECT vantadrive::find_optimal_target(int type)
         {
             lowest_score = score;
             target = game_piece;
-        }
-        if (game_piece.classID == RedRing || game_piece.classID == BlueRing)
-        {
-            ring_locations.push_back(vec({x_p, y_p}));
         }
     }
     return target;
@@ -202,9 +214,9 @@ void vantadrive::driveTo(double targetX, double targetY, bool reverse, double to
     turnTo(targetX, targetY, reverse);
     driveController.reset();
     holdController.reset();
-    while ((distanceTo(targetX, targetY) > 5 * tolerance) && (timer::system() - start_time) < 5000)
+    while ((distanceTo(targetX, targetY) > 2 * tolerance) && (timer::system() - start_time) < 5000)
     {
-        drive_speed = driveController.calculate(distanceTo(targetX, targetY));
+        drive_speed = 40; // driveController.calculate(distanceTo(targetX, targetY));
         if (reverse)
             drive_speed *= -1;
         targetHeading = bearingTo(targetX, targetY);

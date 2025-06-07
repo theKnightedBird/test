@@ -3,12 +3,19 @@
 
 using namespace vex;
 
+enum intake_state
+{
+    RUN,
+    STOP,
+    REVERSE
+};
+
 class intaker
 {
     motor_group &intake_motor;
     optical &intake_sensor;
     thread periodicThread;
-    bool runIntake = false;
+    intake_state runIntake = STOP;
     bool hasRing = false;
     double numRingsInGoal = 0;
     int hook = 980;
@@ -30,4 +37,5 @@ public:
     void intake();
     void rejectRing();
     void stop();
+    void reverse();
 };
